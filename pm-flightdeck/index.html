@@ -1173,7 +1173,12 @@
     Store.saveSettings();
     closeOverlay(); render(); toast('Settings saved');
   }
+  let downloads = null; // Claude artifact 'downloads' capability, when this page runs inside the viewer
   function download(name, text, type) {
+    if (downloads) {
+      downloads.save({ filename: name, data: text }).then(() => toast('Saved ' + name), (e) => { if (e && e.code !== 'declined') toast('Could not save file: ' + (e.code || 'unknown')); });
+      return;
+    }
     const blob = new Blob([text], { type: type || 'text/plain' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
@@ -1281,5 +1286,8 @@
   }
   render();
   Store.connectDb();
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('downloads').then((d) => { downloads = d || null; }, () => {});
+  }
 })();
 </script>
