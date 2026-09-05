@@ -1,0 +1,1285 @@
+<title>PM Flightdeck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #F3F5F8;
+    --surface: #FFFFFF;
+    --surface-2: #EDF0F4;
+    --ink: #172033;
+    --ink-2: #4E5668;
+    --muted: #7C8496;
+    --line: #DFE3EA;
+    --line-2: #CBD1DB;
+    --accent: #177C79;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #DDF1F0;
+    --amber: #B8741A;
+    --amber-soft: #FBEFD9;
+    --good: #1F8A4C;
+    --good-soft: #DFF3E6;
+    --warn: #B96F00;
+    --warn-soft: #FBEBD0;
+    --crit: #C43E3E;
+    --crit-soft: #FADDDD;
+    --s1: #1A9C99;
+    --s2: #D8782A;
+    --s3: #7F6BD3;
+    --grid: #E8EBF0;
+    --shadow: 0 10px 30px rgba(23, 32, 51, 0.12);
+    --radius: 6px;
+    --font-ui: "Manrope", "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #0F1320;
+      --surface: #161B26;
+      --surface-2: #1E2432;
+      --ink: #E8ECF3;
+      --ink-2: #B3BAC8;
+      --muted: #7F899C;
+      --line: #283040;
+      --line-2: #354054;
+      --accent: #2FB5B1;
+      --accent-ink: #0B1A1A;
+      --accent-soft: #163634;
+      --amber: #E0A04A;
+      --amber-soft: #3A2C14;
+      --good: #4CC17A;
+      --good-soft: #163A26;
+      --warn: #E0A040;
+      --warn-soft: #3D2E12;
+      --crit: #E36A6A;
+      --crit-soft: #421C1C;
+      --s1: #1F9D9A;
+      --s2: #D0703A;
+      --s3: #8676D8;
+      --grid: #232A38;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #0F1320;
+    --surface: #161B26;
+    --surface-2: #1E2432;
+    --ink: #E8ECF3;
+    --ink-2: #B3BAC8;
+    --muted: #7F899C;
+    --line: #283040;
+    --line-2: #354054;
+    --accent: #2FB5B1;
+    --accent-ink: #0B1A1A;
+    --accent-soft: #163634;
+    --amber: #E0A04A;
+    --amber-soft: #3A2C14;
+    --good: #4CC17A;
+    --good-soft: #163A26;
+    --warn: #E0A040;
+    --warn-soft: #3D2E12;
+    --crit: #E36A6A;
+    --crit-soft: #421C1C;
+    --s1: #1F9D9A;
+    --s2: #D0703A;
+    --s3: #8676D8;
+    --grid: #232A38;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; font-weight: 700; letter-spacing: -0.01em; }
+  h1 { font-size: 20px; }
+  h2 { font-size: 16px; }
+  h3 { font-size: 14px; }
+  p { margin: 0; }
+  a { color: var(--accent); }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  .ink2 { color: var(--ink-2); }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .small { font-size: 12px; }
+
+  /* ---------- shell ---------- */
+  .app { display: grid; grid-template-columns: 224px 1fr; min-height: 100vh; }
+  .rail {
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    padding: 20px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; }
+  .brand-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; letter-spacing: -0.02em; }
+  .brand-name { font-weight: 800; font-size: 15px; letter-spacing: -0.01em; }
+  .brand-sub { font-size: 11px; color: var(--muted); }
+  .nav-btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink-2);
+    padding: 9px 10px; border-radius: var(--radius); font-weight: 600;
+  }
+  .nav-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-btn[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+  .nav-btn .count { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--surface-2); padding: 1px 6px; border-radius: 10px; }
+  .nav-btn[aria-current="page"] .count { background: var(--surface); }
+  .nav-btn .count.alert { color: var(--crit); }
+  .rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+  .storage-pill { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); padding: 8px 10px; }
+  .storage-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .storage-pill .dot.on { background: var(--good); }
+
+  .main { min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    display: flex; align-items: center; gap: 12px; padding: 14px 28px;
+    background: var(--surface); border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 5;
+  }
+  .topbar h1 { flex: 0 0 auto; }
+  .topbar .date { color: var(--muted); font-size: 12px; }
+  .capture { flex: 1; display: flex; gap: 8px; max-width: 640px; margin-left: auto; }
+  .capture input { flex: 1; }
+  .content { padding: 24px 28px 60px; display: flex; flex-direction: column; gap: 20px; max-width: 1400px; width: 100%; }
+
+  /* ---------- controls ---------- */
+  .btn {
+    border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
+    padding: 7px 12px; border-radius: var(--radius); font-weight: 600; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.danger { color: var(--crit); }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--ink-2); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--ink); }
+  .btn.sm { padding: 4px 8px; font-size: 12px; }
+  .btn.icon { padding: 5px 7px; }
+  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    border: 1px solid var(--line-2); background: var(--surface); border-radius: var(--radius);
+    padding: 7px 10px; font-size: 13px; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+  textarea { min-height: 70px; resize: vertical; }
+  label.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  label.field input, label.field select, label.field textarea { font-weight: 400; color: var(--ink); }
+  .check { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 13px; }
+  .check input { width: 15px; height: 15px; accent-color: var(--accent); margin: 0; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .grow { flex: 1; }
+
+  /* ---------- chips ---------- */
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+  .chip.q1 { background: var(--crit-soft); color: var(--crit); }
+  .chip.q2 { background: var(--accent-soft); color: var(--accent); }
+  .chip.q3 { background: var(--amber-soft); color: var(--amber); }
+  .chip.q4 { background: var(--surface-2); color: var(--muted); }
+  .chip.due { background: var(--surface-2); color: var(--ink-2); font-family: var(--font-mono); font-weight: 500; }
+  .chip.due.over { background: var(--crit-soft); color: var(--crit); }
+  .chip.due.soon { background: var(--warn-soft); color: var(--warn); }
+  .chip.blocked { background: var(--crit-soft); color: var(--crit); }
+  .chip.tag { background: var(--surface-2); color: var(--ink-2); font-weight: 600; }
+  .chip.focus { background: var(--amber-soft); color: var(--amber); }
+  .chip.sample { background: transparent; border: 1px dashed var(--line-2); color: var(--muted); font-weight: 600; }
+  .sev { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
+  .sev.critical { background: var(--crit); }
+  .sev.warning { background: var(--warn); }
+  .sev.info { background: var(--s1); }
+
+  /* ---------- panels ---------- */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .panel-head h2 { font-size: 14px; }
+  .panel-body { padding: 14px 16px; }
+  .panel-body.tight { padding: 0; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .empty { padding: 26px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+
+  /* stat tiles */
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .tile .value { font-family: var(--font-mono); font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+  .tile .value .unit { font-size: 13px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+  .tile .delta { font-size: 12px; color: var(--muted); }
+  .tile .value.good { color: var(--good); }
+  .tile .value.warn { color: var(--warn); }
+  .tile .value.crit { color: var(--crit); }
+
+  /* task list rows */
+  .tlist { display: flex; flex-direction: column; }
+  .trow { display: grid; grid-template-columns: 62px 1fr auto; gap: 12px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--line); cursor: pointer; }
+  .trow:first-child { border-top: 0; }
+  .trow:hover { background: var(--surface-2); }
+  .trow .tid { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .trow .ttl { font-weight: 600; }
+  .trow .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .trow .meta { display: flex; gap: 6px; align-items: center; }
+
+  /* ---------- board ---------- */
+  .board { display: grid; grid-template-columns: repeat(6, minmax(168px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+  .col { background: var(--surface-2); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 240px; border: 1px solid transparent; }
+  .col.over-limit { border-color: var(--crit); }
+  .col.drop { border-color: var(--accent); }
+  .col-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 2px 4px 4px; }
+  .col-head h3 { font-size: 13px; }
+  .col-head .wip { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .col-head .wip.bad { color: var(--crit); font-weight: 600; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 10px 8px; cursor: grab; display: flex; flex-direction: column; gap: 6px; }
+  .card:hover { border-color: var(--line-2); box-shadow: 0 2px 8px rgba(23,32,51,0.06); }
+  .card.dragging { opacity: 0.5; }
+  .card .top { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .card .tid { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .card .title { font-weight: 600; font-size: 13px; line-height: 1.35; }
+  .card .foot { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .card .age { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .card .age.old { color: var(--warn); font-weight: 600; }
+  .card.done { opacity: 0.75; }
+  .card .stripe { height: 3px; border-radius: 2px; margin: -10px -10px 2px; }
+  .stripe.q1 { background: var(--crit); }
+  .stripe.q2 { background: var(--accent); }
+  .stripe.q3 { background: var(--amber); }
+  .stripe.q4 { background: var(--line-2); }
+
+  /* ---------- prioritise ---------- */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+  .tab { border: 0; background: transparent; padding: 8px 12px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.data th, table.data td { padding: 8px 10px; text-align: left; border-top: 1px solid var(--line); vertical-align: middle; }
+  table.data th { border-top: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; white-space: nowrap; }
+  table.data td.num, table.data th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  table.data td input, table.data td select { padding: 4px 6px; font-size: 12px; }
+  table.data td input[type="number"] { width: 72px; text-align: right; font-family: var(--font-mono); }
+  table.data td select { width: auto; }
+  table.data tr:hover td { background: var(--surface-2); }
+  .score { font-weight: 600; }
+  .rank { font-family: var(--font-mono); color: var(--muted); font-size: 12px; }
+  .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quad { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 180px; }
+  .quad h3 { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .quad .rule { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .quad.q1 { border-top: 3px solid var(--crit); }
+  .quad.q2 { border-top: 3px solid var(--accent); }
+  .quad.q3 { border-top: 3px solid var(--amber); }
+  .quad.q4 { border-top: 3px solid var(--line-2); }
+  .quad .item { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-top: 1px solid var(--line); font-size: 13px; }
+  .quad .item:first-of-type { border-top: 0; }
+  .quad .item .tid { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .quad .item .t { flex: 1; cursor: pointer; }
+  .quad .item .t:hover { color: var(--accent); }
+  .mini-toggle { display: inline-flex; border: 1px solid var(--line-2); border-radius: 4px; overflow: hidden; }
+  .mini-toggle button { border: 0; background: transparent; padding: 2px 7px; font-size: 11px; font-weight: 700; color: var(--muted); }
+  .mini-toggle button.on { background: var(--surface-2); color: var(--ink); }
+
+  /* ---------- health ---------- */
+  .health-hero { display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: stretch; }
+  .gauge { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 18px; }
+  .gauge .num { font-family: var(--font-mono); font-size: 44px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
+  .gauge .num.good { color: var(--good); }
+  .gauge .num.warn { color: var(--warn); }
+  .gauge .num.crit { color: var(--crit); }
+  .rule-list { display: flex; flex-direction: column; }
+  .rule { border-top: 1px solid var(--line); }
+  .rule:first-child { border-top: 0; }
+  .rule summary { display: grid; grid-template-columns: 14px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; cursor: pointer; list-style: none; }
+  .rule summary::-webkit-details-marker { display: none; }
+  .rule summary:hover { background: var(--surface-2); }
+  .rule .rname { font-weight: 600; }
+  .rule .rcount { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .rule .rcount.hit { color: var(--ink); font-weight: 600; }
+  .rule .rbody { padding: 0 16px 14px 42px; display: flex; flex-direction: column; gap: 10px; }
+  .rule .why { font-size: 12.5px; color: var(--ink-2); max-width: 72ch; }
+  .rule .src { font-size: 11.5px; color: var(--muted); }
+  .rule.pass summary { color: var(--muted); }
+  .hit-list { display: flex; flex-direction: column; gap: 4px; }
+  .hit { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .hit .tid { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .hit button { border: 0; background: transparent; color: var(--ink); padding: 2px 0; text-align: left; font-weight: 500; }
+  .hit button:hover { color: var(--accent); text-decoration: underline; }
+  .hit .detail { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+
+  /* ---------- charts ---------- */
+  .chart { width: 100%; height: auto; display: block; }
+  .chart text { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+  .chart .grid line { stroke: var(--grid); stroke-width: 1; }
+  .chart .axis line { stroke: var(--line-2); stroke-width: 1; }
+  .chart .bar { fill: var(--s1); }
+  .chart .bar.hl { fill: var(--accent); }
+  .chart .mark { cursor: default; }
+  .chart .ref { stroke: var(--crit); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .chart .lbl { fill: var(--ink-2); font-weight: 600; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+  .legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .tooltip { position: fixed; pointer-events: none; background: var(--ink); color: var(--ground); padding: 6px 9px; border-radius: 4px; font-size: 12px; z-index: 50; box-shadow: var(--shadow); max-width: 260px; display: none; }
+  .tooltip .t { font-weight: 700; }
+
+  /* ---------- review ---------- */
+  .checklist { display: flex; flex-direction: column; }
+  .checklist label { display: grid; grid-template-columns: 18px 1fr; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--line); cursor: pointer; align-items: start; }
+  .checklist label:first-child { border-top: 0; }
+  .checklist input { width: 16px; height: 16px; accent-color: var(--accent); margin-top: 2px; }
+  .checklist .ct { font-weight: 600; }
+  .checklist .cd { font-size: 12px; color: var(--muted); }
+  .report { font-family: var(--font-mono); font-size: 12.5px; white-space: pre-wrap; background: var(--surface-2); border-radius: 6px; padding: 14px; line-height: 1.55; max-height: 460px; overflow: auto; }
+
+  /* ---------- drawer & modal ---------- */
+  .scrim { position: fixed; inset: 0; background: rgba(10, 14, 24, 0.35); z-index: 20; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: var(--surface); border-left: 1px solid var(--line); z-index: 21; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+  .drawer-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .drawer-body { padding: 18px 20px; overflow: auto; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+  .drawer-foot { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--surface); }
+  .fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .fieldset > .eyebrow { margin-bottom: -2px; }
+  .rice-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .rice-out { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--muted); }
+  .rice-out .v { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--ink); }
+  .dod { display: flex; flex-direction: column; gap: 6px; }
+  .dod-item { display: flex; align-items: center; gap: 8px; }
+  .dod-item input[type="text"] { flex: 1; }
+  .modal { position: fixed; inset: 0; z-index: 22; display: grid; place-items: center; padding: 20px; }
+  .modal-box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; width: min(640px, 100%); max-height: 90vh; overflow: auto; box-shadow: var(--shadow); }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--ground); padding: 9px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; z-index: 60; box-shadow: var(--shadow); }
+  kbd { font-family: var(--font-mono); font-size: 11px; background: var(--surface-2); border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: var(--ink-2); }
+
+  @media (max-width: 960px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: 10px 12px; gap: 4px; }
+    .brand { padding: 4px 8px; width: 100%; }
+    .rail-foot { margin-top: 0; flex-direction: row; width: 100%; }
+    .grid-2, .grid-3, .grid-4, .health-hero, .matrix { grid-template-columns: 1fr; }
+    .content, .topbar { padding-left: 14px; padding-right: 14px; }
+    .capture { max-width: none; }
+    .rice-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .drawer { animation: slide 160ms ease-out; }
+    @keyframes slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  }
+</style>
+
+<div class="app" id="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">PM</div>
+      <div>
+        <div class="brand-name">Flightdeck</div>
+        <div class="brand-sub">Task control for product managers</div>
+      </div>
+    </div>
+    <nav id="nav" aria-label="Views"></nav>
+    <div class="rail-foot">
+      <button class="btn ghost" id="btn-settings">Settings &amp; data</button>
+      <div class="storage-pill" id="storage-pill"><span class="dot"></span><span>Saving in this browser</span></div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="view-title">Today</h1>
+        <div class="date" id="today-label"></div>
+      </div>
+      <form class="capture" id="capture-form" autocomplete="off">
+        <input type="text" id="capture-input" placeholder="Capture a task — start with a verb, e.g. “Draft KYC vendor SLA review”" aria-label="Capture a task">
+        <button class="btn primary" type="submit">Add to backlog</button>
+      </form>
+    </header>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+<div class="tooltip" id="tooltip"></div>
+<div id="overlay"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= constants ================= */
+  const STATUSES = [
+    { id: 'backlog', label: 'Backlog', hint: 'Later. Not yet committed.' },
+    { id: 'next', label: 'Next', hint: 'Committed, ready to start.' },
+    { id: 'doing', label: 'In progress', hint: 'Now. Work is active.' },
+    { id: 'blocked', label: 'Blocked / Waiting', hint: 'Needs someone else. Chase it.' },
+    { id: 'review', label: 'In review', hint: 'Awaiting sign-off or validation.' },
+    { id: 'done', label: 'Done', hint: 'Definition of Done met.' }
+  ];
+  const OPEN = ['backlog', 'next', 'doing', 'blocked', 'review'];
+  const WIP = ['doing', 'blocked', 'review'];
+  const QUADS = {
+    q1: { label: 'Do first', rule: 'Important and urgent. Crises and deadlines. Handle today.' },
+    q2: { label: 'Schedule', rule: 'Important, not urgent. Strategy, discovery, relationships. Where a PM should spend most time.' },
+    q3: { label: 'Delegate', rule: 'Urgent, not important. Interruptions and requests. Hand off or time-box.' },
+    q4: { label: 'Eliminate', rule: 'Neither. Question whether it should exist.' }
+  };
+  const IMPACT = [
+    { v: 3, label: '3 · Massive' }, { v: 2, label: '2 · High' }, { v: 1, label: '1 · Medium' },
+    { v: 0.5, label: '0.5 · Low' }, { v: 0.25, label: '0.25 · Minimal' }
+  ];
+  const CONF = [{ v: 100, label: '100% · Data' }, { v: 80, label: '80% · Some data' }, { v: 50, label: '50% · Gut feel' }];
+  const VIEWS = [
+    { id: 'today', label: 'Today' },
+    { id: 'board', label: 'Board' },
+    { id: 'prioritise', label: 'Prioritise' },
+    { id: 'health', label: 'Health check' },
+    { id: 'metrics', label: 'Metrics' },
+    { id: 'review', label: 'Weekly review' }
+  ];
+  const DEFAULT_SETTINGS = {
+    wip: { next: 6, doing: 3, blocked: 3, review: 3 },
+    staleDays: 5,
+    blockedDays: 3,
+    backlogAgeDays: 30,
+    seq: 1,
+    objectives: ['Cut onboarding drop-off', 'Ship SME onboarding v2', 'Reduce KYC cost per case'],
+    review: { week: '', checks: {}, focus: '' },
+    reviews: [],
+    prioTab: 'rice',
+    sampleLoaded: false
+  };
+  const LS_KEY = 'pm-flightdeck-v1';
+
+  /* ================= utils ================= */
+  const $ = (s, el) => (el || document).querySelector(s);
+  const h = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const DAY = 86400000;
+  const now = () => new Date();
+  const iso = (d) => new Date(d).toISOString();
+  const ymd = (d) => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+  const todayYmd = () => ymd(now());
+  const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+  const daysBetween = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / DAY);
+  const daysSince = (d) => d ? daysBetween(new Date(d), now()) : null;
+  const daysUntil = (ymdStr) => ymdStr ? daysBetween(now(), new Date(ymdStr + 'T00:00:00')) : null;
+  const fmtDate = (d) => { if (!d) return ''; const x = new Date(d.length === 10 ? d + 'T00:00:00' : d); return x.toLocaleDateString(undefined, { day: '2-digit', month: 'short' }); };
+  const fmtLong = (d) => new Date(d).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const median = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); const m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const pct = (a, p) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.ceil(p * s.length) - 1)]; };
+  const wordCount = (s) => (s || '').trim().split(/\s+/).filter(Boolean).length;
+  function mondayOf(d) { const x = startOfDay(d); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day); return x; }
+  function weekKey(d) { return ymd(mondayOf(d)); }
+  function quadrant(t) { return t.important ? (t.urgent ? 'q1' : 'q2') : (t.urgent ? 'q3' : 'q4'); }
+  function riceScore(t) {
+    const r = t.rice || {};
+    if (!(r.reach > 0) || !(r.effort > 0) || !(r.impact > 0) || !(r.confidence > 0)) return null;
+    return (r.reach * r.impact * (r.confidence / 100)) / r.effort;
+  }
+  function fmtScore(s) { return s == null ? '—' : (s >= 100 ? Math.round(s).toString() : s.toFixed(1)); }
+  function statusLabel(id) { const s = STATUSES.find((x) => x.id === id); return s ? s.label : id; }
+  function ageInStatus(t) { return daysSince(t.statusChangedAt || t.createdAt) || 0; }
+  function cycleDays(t) { if (!t.doneAt) return null; return Math.max(0, daysBetween(new Date(t.startedAt || t.createdAt), new Date(t.doneAt))); }
+  function isDone(t) { return t.status === 'done'; }
+  function toast(msg) { const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2200); }
+
+  /* ================= store ================= */
+  const Store = {
+    mode: 'local',
+    db: null,
+    tasks: {},
+    settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+    ready: false,
+    list() { return Object.values(this.tasks); },
+    get(id) { return this.tasks[id]; },
+    loadLocal() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (raw) {
+          const data = JSON.parse(raw);
+          this.tasks = data.tasks || {};
+          this.settings = Object.assign(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), data.settings || {});
+          return true;
+        }
+      } catch (e) { /* storage unavailable: run in memory */ }
+      return false;
+    },
+    persistLocal() {
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ tasks: this.tasks, settings: this.settings })); } catch (e) { /* ignore */ }
+    },
+    newId() {
+      const n = this.settings.seq || 1;
+      this.settings.seq = n + 1;
+      this.saveSettings();
+      return 'T-' + String(n).padStart(3, '0');
+    },
+    saveTask(t, silent) {
+      t.updatedAt = iso(now());
+      this.tasks[t.id] = t;
+      if (this.mode === 'db') {
+        this.db.doc('tasks/' + t.id).set(t).catch((e) => toast('Could not save: ' + (e && e.message ? e.message : 'unknown error')));
+      } else { this.persistLocal(); }
+      if (!silent) render();
+    },
+    deleteTask(id) {
+      delete this.tasks[id];
+      if (this.mode === 'db') { this.db.doc('tasks/' + id).delete().catch(() => {}); } else { this.persistLocal(); }
+      render();
+    },
+    saveSettings() {
+      if (this.mode === 'db') { this.db.doc('meta/settings').set(this.settings).catch(() => {}); } else { this.persistLocal(); }
+    },
+    replaceAll(tasks, settings) {
+      const old = Object.keys(this.tasks);
+      this.tasks = {};
+      tasks.forEach((t) => { this.tasks[t.id] = t; });
+      if (settings) this.settings = Object.assign(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), settings);
+      if (this.mode === 'db') {
+        old.filter((id) => !this.tasks[id]).forEach((id) => this.db.doc('tasks/' + id).delete().catch(() => {}));
+        tasks.forEach((t) => this.db.doc('tasks/' + t.id).set(t).catch(() => {}));
+        this.db.doc('meta/settings').set(this.settings).catch(() => {});
+      } else { this.persistLocal(); }
+      render();
+    },
+    async connectDb() {
+      try {
+        if (!(window.claude && typeof window.claude.use === 'function')) return;
+        const db = await window.claude.use('db');
+        if (!db) return;
+        this.db = db;
+        this.mode = 'db';
+        const pill = $('#storage-pill');
+        pill.innerHTML = '<span class="dot on"></span><span>Synced to your Claude workspace</span>';
+        let settingsSeen = false;
+        db.doc('meta/settings').onSnapshot((snap) => {
+          if (snap.exists) this.settings = Object.assign(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), snap.data());
+          settingsSeen = true;
+          render();
+        }, () => {});
+        db.collection('tasks').onSnapshot((snap) => {
+          const next = {};
+          snap.docs.forEach((d) => { const t = d.data(); if (t && t.id) next[t.id] = t; });
+          this.tasks = next;
+          this.ready = true;
+          if (!snap.metadata.fromCache && settingsSeen && !Object.keys(next).length && !this.settings.sampleLoaded) {
+            // brand-new store: nothing to show yet
+          }
+          render();
+        }, (e) => { toast('Live sync stopped: ' + e.code); });
+      } catch (e) { /* stay local */ }
+    }
+  };
+
+  /* ================= sample data ================= */
+  /*SAMPLE-START*/
+  function sampleTasks(base) {
+    const b = base ? new Date(base) : new Date();
+    const d = (offset) => { const x = new Date(b); x.setDate(x.getDate() + offset); x.setHours(10, 0, 0, 0); return x.toISOString(); };
+    const dd = (offset) => d(offset).slice(0, 10);
+    const T = (id, o) => Object.assign({
+      id, title: '', why: '', objective: '', status: 'backlog', important: false, urgent: false,
+      rice: { reach: null, impact: null, confidence: null, effort: null }, due: '', stakeholder: '', tags: [],
+      dod: [], notes: '', blockedReason: '', focus: false, sample: true,
+      createdAt: d(-20), updatedAt: d(-1), statusChangedAt: d(-1), startedAt: null, doneAt: null
+    }, o);
+    return [
+      T('T-001', { title: 'Ship eKYC retry flow for failed liveness checks', why: 'Liveness failures are 31% of onboarding drop-off; a retry with guidance recovers a share of them.', objective: 'Cut onboarding drop-off', status: 'doing', important: true, urgent: true, rice: { reach: 1800, impact: 2, confidence: 80, effort: 3 }, due: dd(2), stakeholder: 'Eng lead · Compliance', tags: ['onboarding', 'kyc'], dod: [{ text: 'Retry UX approved by Compliance', done: true }, { text: 'Funnel event instrumented', done: false }, { text: 'Release note published', done: false }], createdAt: d(-24), statusChangedAt: d(-6), startedAt: d(-6), updatedAt: d(-1), focus: true }),
+      T('T-002', { title: 'Define success metrics for SME onboarding funnel', why: 'Without a baseline the v2 launch cannot be judged. Needed before design starts.', objective: 'Ship SME onboarding v2', status: 'doing', important: true, urgent: false, rice: { reach: 600, impact: 3, confidence: 80, effort: 1 }, due: dd(5), stakeholder: 'Head of Product · Data', tags: ['sme', 'analytics'], dod: [{ text: 'North-star and 3 guardrail metrics agreed', done: false }, { text: 'Dashboard spec handed to Data', done: false }], createdAt: d(-15), statusChangedAt: d(-9), startedAt: d(-9), updatedAt: d(-8), focus: true }),
+      T('T-003', { title: 'Review SLA with KYC vendor before renewal', why: 'Contract renews in 3 weeks; P95 verification time has doubled since Q1.', objective: 'Reduce KYC cost per case', status: 'blocked', important: true, urgent: true, rice: { reach: 5000, impact: 2, confidence: 100, effort: 1 }, due: dd(-2), stakeholder: 'Procurement · Vendor AM', tags: ['kyc', 'vendor'], dod: [{ text: 'Vendor P95 report received', done: false }, { text: 'Renewal recommendation sent to CFO', done: false }], blockedReason: '', createdAt: d(-30), statusChangedAt: d(-5), startedAt: d(-12), updatedAt: d(-5) }),
+      T('T-004', { title: 'Write PRD for document upload fallback (manual review)', why: 'Customers with unsupported ID types have no path today; support tickets rising.', objective: 'Cut onboarding drop-off', status: 'next', important: true, urgent: false, rice: { reach: 400, impact: 1, confidence: 80, effort: 2 }, due: dd(9), stakeholder: 'Ops lead', tags: ['onboarding'], dod: [{ text: 'PRD reviewed by Eng and Ops', done: false }], createdAt: d(-10), statusChangedAt: d(-3), updatedAt: d(-3) }),
+      T('T-005', { title: 'Prepare Q4 roadmap narrative for exec review', why: 'Exec review on the 18th decides headcount for onboarding squad.', objective: 'Ship SME onboarding v2', status: 'next', important: true, urgent: false, rice: { reach: 20, impact: 3, confidence: 50, effort: 1.5 }, due: dd(12), stakeholder: 'CPO', tags: ['roadmap'], dod: [{ text: 'One-page narrative', done: false }, { text: 'Options with cost/impact', done: false }], createdAt: d(-7), statusChangedAt: d(-7), updatedAt: d(-7) }),
+      T('T-006', { title: 'Answer sales request for custom onboarding demo', why: '', status: 'next', important: false, urgent: true, rice: { reach: 5, impact: 0.5, confidence: 80, effort: 0.5 }, due: dd(1), stakeholder: 'Sales director', tags: ['request'], createdAt: d(-2), statusChangedAt: d(-2), updatedAt: d(-2) }),
+      T('T-007', { title: 'Benchmark competitor onboarding time-to-first-transaction', why: 'Board asked how we compare; informs the v2 target.', objective: 'Ship SME onboarding v2', status: 'backlog', important: true, urgent: false, rice: { reach: 50, impact: 1, confidence: 50, effort: 1 }, due: '', stakeholder: 'Strategy', tags: ['research'], createdAt: d(-40), statusChangedAt: d(-40), updatedAt: d(-40) }),
+      T('T-008', { title: 'Fix typo', why: '', status: 'backlog', important: false, urgent: false, rice: { reach: null, impact: null, confidence: null, effort: null }, tags: [], createdAt: d(-3), statusChangedAt: d(-3), updatedAt: d(-3) }),
+      T('T-009', { title: 'Run usability test on new address-capture step', why: 'Address step has 12% abandonment; hypothesis is that autocomplete fails for PO boxes.', objective: 'Cut onboarding drop-off', status: 'review', important: true, urgent: false, rice: { reach: 900, impact: 1, confidence: 80, effort: 1 }, due: dd(3), stakeholder: 'UX research', tags: ['onboarding', 'research'], dod: [{ text: '5 sessions completed', done: true }, { text: 'Findings shared with squad', done: true }, { text: 'Backlog items created', done: false }], createdAt: d(-18), statusChangedAt: d(-2), startedAt: d(-11), updatedAt: d(-2) }),
+      T('T-010', { title: 'Audit consent copy against updated data-protection guidance', why: 'Legal flagged the consent wording; risk of remediation if not aligned before audit.', objective: 'Reduce KYC cost per case', status: 'backlog', important: true, urgent: true, rice: { reach: 5000, impact: 1, confidence: 80, effort: 1 }, due: dd(6), stakeholder: 'Legal', tags: ['compliance'], createdAt: d(-4), statusChangedAt: d(-4), updatedAt: d(-4) }),
+      T('T-011', { title: 'Launch in-app progress indicator for onboarding steps', why: 'Users who see progress complete 8% more often in similar flows (internal A/B, Q2).', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: false, rice: { reach: 2000, impact: 1, confidence: 100, effort: 1.5 }, due: dd(-8), stakeholder: 'Design', tags: ['onboarding'], dod: [{ text: 'A/B result reviewed', done: true }, { text: 'Rolled to 100%', done: true }], createdAt: d(-36), statusChangedAt: d(-9), startedAt: d(-22), doneAt: d(-9), updatedAt: d(-9) }),
+      T('T-012', { title: 'Reduce OTP delivery failures with secondary SMS provider', why: 'OTP failure was the #1 support driver in July.', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: true, rice: { reach: 3000, impact: 2, confidence: 80, effort: 2 }, due: dd(-15), stakeholder: 'Eng lead', tags: ['onboarding', 'platform'], dod: [{ text: 'Failover tested', done: true }, { text: 'Support macro updated', done: true }], createdAt: d(-45), statusChangedAt: d(-16), startedAt: d(-31), doneAt: d(-16), updatedAt: d(-16) }),
+      T('T-013', { title: 'Set up weekly onboarding funnel review with Data', why: 'Funnel changes were noticed a month late in Q2.', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: false, rice: { reach: 10, impact: 1, confidence: 100, effort: 0.25 }, due: dd(-20), stakeholder: 'Data', tags: ['analytics'], dod: [{ text: 'Recurring meeting and dashboard link', done: true }], createdAt: d(-33), statusChangedAt: d(-24), startedAt: d(-27), doneAt: d(-24), updatedAt: d(-24) }),
+      T('T-014', { title: 'Migrate KYC decision logs to new audit store', why: 'Audit asked for 7-year retention; current store purges at 2.', objective: 'Reduce KYC cost per case', status: 'done', important: true, urgent: false, rice: { reach: 5000, impact: 0.5, confidence: 80, effort: 3 }, due: dd(-3), stakeholder: 'Compliance · Platform', tags: ['compliance', 'platform'], dod: [{ text: 'Backfill verified by Audit', done: true }, { text: 'Old purge job disabled', done: false }], createdAt: d(-50), statusChangedAt: d(-4), startedAt: d(-35), doneAt: d(-4), updatedAt: d(-4) }),
+      T('T-015', { title: 'Close pricing question from partner bank on per-check fees', why: '', status: 'done', important: false, urgent: true, rice: { reach: 1, impact: 0.5, confidence: 100, effort: 0.25 }, due: dd(-30), stakeholder: 'Partnerships', tags: ['request'], createdAt: d(-34), statusChangedAt: d(-31), startedAt: d(-32), doneAt: d(-31), updatedAt: d(-31) }),
+      T('T-016', { title: 'Draft experiment plan: pre-filled company data from registry', why: 'Hypothesis: pre-filling registry data cuts SME form time by 40%.', objective: 'Ship SME onboarding v2', status: 'backlog', important: true, urgent: false, rice: { reach: 600, impact: 2, confidence: 50, effort: 2 }, due: '', stakeholder: 'Eng lead', tags: ['sme', 'experiment'], createdAt: d(-6), statusChangedAt: d(-6), updatedAt: d(-6) })
+    ];
+  }
+  /*SAMPLE-END*/
+
+  /* ================= health rules ================= */
+  const RULES = [
+    {
+      id: 'overdue', sev: 'critical', name: 'Overdue tasks',
+      why: 'A missed date that nobody re-planned is the earliest signal that commitments and capacity have drifted apart. Re-plan or renegotiate the date, never leave it red.',
+      src: 'Kanban: make policies explicit and manage flow (Anderson, Kanban, 2010).',
+      test: (t) => !isDone(t) && t.due && daysUntil(t.due) < 0,
+      detail: (t) => Math.abs(daysUntil(t.due)) + 'd late'
+    },
+    {
+      id: 'wip', sev: 'critical', name: 'WIP limit exceeded', column: true,
+      why: 'More work in progress means longer cycle times and more context switching (Little’s Law). The limit forces the conversation about what to stop.',
+      src: 'Little’s Law; Personal Kanban (Benson & Barry, 2011) recommends a WIP of about 3.',
+      test: (t) => false
+    },
+    {
+      id: 'stale', sev: 'warning', name: 'Stale work in progress',
+      why: 'An item in progress with no update for several days is usually blocked in disguise. Either it is not really in progress, or someone is waiting and nobody knows.',
+      src: 'Aging work-in-progress as a leading indicator (Vacanti, Actionable Agile Metrics, 2015).',
+      test: (t, s) => (t.status === 'doing' || t.status === 'review') && daysSince(t.updatedAt) > s.staleDays,
+      detail: (t) => daysSince(t.updatedAt) + 'd without update'
+    },
+    {
+      id: 'blocked-reason', sev: 'warning', name: 'Blocked without a stated blocker',
+      why: 'A blocked task must name who or what it waits on, otherwise it cannot be chased or escalated.',
+      src: 'Kanban blocker clustering; explicit policies (Anderson, 2010).',
+      test: (t) => t.status === 'blocked' && !(t.blockedReason || '').trim()
+    },
+    {
+      id: 'blocked-long', sev: 'warning', name: 'Blocked for too long',
+      why: 'Blockers older than a few days rarely resolve themselves. Escalate, swap the dependency, or move the item back to Next.',
+      src: 'Blocker escalation cadence in Kanban service delivery reviews.',
+      test: (t, s) => t.status === 'blocked' && ageInStatus(t) > s.blockedDays,
+      detail: (t) => ageInStatus(t) + 'd blocked'
+    },
+    {
+      id: 'no-why', sev: 'warning', name: 'No outcome stated',
+      why: 'Every task should say which outcome it moves. A task without a “why” is output for its own sake and cannot be prioritised honestly.',
+      src: 'Outcomes over outputs (Seiden, 2019); The Build Trap (Perri, 2018).',
+      test: (t) => !isDone(t) && !(t.why || '').trim()
+    },
+    {
+      id: 'no-objective', sev: 'info', name: 'Not linked to an objective',
+      why: 'Linking each task to one of your current objectives makes the weekly review answer “are we spending time on what we said matters?”',
+      src: 'OKR alignment (Doerr, Measure What Matters, 2018).',
+      test: (t) => !isDone(t) && t.status !== 'backlog' && !(t.objective || '').trim()
+    },
+    {
+      id: 'no-due', sev: 'warning', name: 'In progress with no target date',
+      why: 'Work that is started but has no date cannot be sequenced against other work or promised to anyone.',
+      src: 'Time-boxing; commitment point in Kanban.',
+      test: (t) => t.status === 'doing' && !t.due
+    },
+    {
+      id: 'unscored', sev: 'info', name: 'Committed but not scored',
+      why: 'Items in Next are a promise of capacity. If they carry no RICE score, the order of the queue is opinion, not evidence.',
+      src: 'RICE prioritisation (McBride, Intercom, 2016).',
+      test: (t) => t.status === 'next' && riceScore(t) == null
+    },
+    {
+      id: 'dod', sev: 'warning', name: 'Done with an open checklist item',
+      why: 'If the Definition of Done is not met, the task is not done, it is hidden work. Either finish the item or take it out of the definition.',
+      src: 'Definition of Done (Scrum Guide, 2020).',
+      test: (t) => isDone(t) && (t.dod || []).some((d) => !d.done)
+    },
+    {
+      id: 'q1-inflation', sev: 'warning', name: 'Too much “Do first”', global: true,
+      why: 'When more than 40% of open work is both important and urgent, everything is a crisis and nothing is prioritised. Push work into Schedule and protect discovery time.',
+      src: 'Eisenhower matrix (Covey, 7 Habits, 1989).',
+      globalTest: (ts) => { const open = ts.filter((t) => !isDone(t)); const q1 = open.filter((t) => quadrant(t) === 'q1'); return open.length >= 5 && q1.length / open.length > 0.4 ? [{ label: q1.length + ' of ' + open.length + ' open tasks are Do first (' + Math.round(100 * q1.length / open.length) + '%)' }] : []; }
+    },
+    {
+      id: 'vague', sev: 'info', name: 'Vague task title',
+      why: 'A title under three words rarely says what “done” looks like. Rewrite as verb + object + qualifier, e.g. “Draft vendor SLA review”.',
+      src: 'Next-action thinking (Allen, Getting Things Done, 2001).',
+      test: (t) => !isDone(t) && wordCount(t.title) < 3
+    },
+    {
+      id: 'backlog-age', sev: 'info', name: 'Backlog item untouched for a month',
+      why: 'Old backlog items are decisions being avoided. Prune it, or schedule it. A long backlog hides the real options.',
+      src: 'Backlog refinement cadence (Scrum Guide); “Options have value, commitments have cost” (Kanban).',
+      test: (t, s) => t.status === 'backlog' && daysSince(t.updatedAt) > s.backlogAgeDays,
+      detail: (t) => daysSince(t.updatedAt) + 'd untouched'
+    },
+    {
+      id: 'review-cadence', sev: 'info', name: 'Weekly review overdue', global: true,
+      why: 'The weekly review is where the system is trusted again: loose ends captured, dates re-planned, next focus chosen. Skip it and the board decays.',
+      src: 'Weekly Review (Allen, Getting Things Done, 2001).',
+      globalTest: (ts, s) => { const last = (s.reviews || []).slice(-1)[0]; if (!last) return [{ label: 'No weekly review recorded yet' }]; const d = daysSince(last.date); return d > 7 ? [{ label: 'Last review ' + d + ' days ago' }] : []; }
+    }
+  ];
+
+  function runHealth() {
+    const ts = Store.list();
+    const s = Store.settings;
+    const results = RULES.map((r) => {
+      let hits = [];
+      if (r.column) {
+        WIP.concat(['next']).forEach((col) => {
+          const n = ts.filter((t) => t.status === col).length;
+          const lim = s.wip[col];
+          if (lim && n > lim) hits.push({ label: statusLabel(col) + ': ' + n + ' items, limit ' + lim, column: col });
+        });
+      } else if (r.global) {
+        hits = r.globalTest(ts, s);
+      } else {
+        hits = ts.filter((t) => r.test(t, s)).map((t) => ({ task: t, detail: r.detail ? r.detail(t) : '' }));
+      }
+      return { rule: r, hits };
+    });
+    const weights = { critical: 12, warning: 5, info: 2 };
+    let penalty = 0;
+    results.forEach((x) => { penalty += Math.min(30, x.hits.length * weights[x.rule.sev]); });
+    const score = Math.max(0, 100 - penalty);
+    return { results, score, totalHits: results.reduce((a, x) => a + x.hits.length, 0) };
+  }
+
+  /* ================= rendering helpers ================= */
+  function chipQuad(t) { const q = quadrant(t); return '<span class="chip ' + q + '">' + QUADS[q].label + '</span>'; }
+  function chipDue(t) {
+    if (!t.due) return '';
+    const d = daysUntil(t.due);
+    const cls = isDone(t) ? '' : d < 0 ? ' over' : d <= 2 ? ' soon' : '';
+    const txt = isDone(t) ? fmtDate(t.due) : d < 0 ? Math.abs(d) + 'd late' : d === 0 ? 'Today' : d === 1 ? 'Tomorrow' : fmtDate(t.due);
+    return '<span class="chip due' + cls + '">' + h(txt) + '</span>';
+  }
+  function taskRow(t, extra) {
+    return '<div class="trow" data-open="' + t.id + '">' +
+      '<span class="tid">' + h(t.id) + '</span>' +
+      '<div><div class="ttl">' + h(t.title) + '</div>' + (t.why ? '<div class="sub">' + h(t.why) + '</div>' : '<div class="sub" style="color:var(--warn)">No outcome stated</div>') + '</div>' +
+      '<div class="meta">' + (extra || '') + (t.status === 'blocked' ? '<span class="chip blocked">Blocked</span>' : '') + chipQuad(t) + chipDue(t) + '</div></div>';
+  }
+  function tile(label, value, unit, cls, delta) {
+    return '<div class="tile"><span class="eyebrow">' + h(label) + '</span><span class="value' + (cls ? ' ' + cls : '') + '">' + h(value) + (unit ? '<span class="unit">' + h(unit) + '</span>' : '') + '</span>' + (delta ? '<span class="delta">' + h(delta) + '</span>' : '') + '</div>';
+  }
+
+  /* ================= views ================= */
+  let view = 'today';
+  let search = '';
+
+  function renderNav() {
+    const health = runHealth();
+    const counts = {
+      today: Store.list().filter((t) => t.focus && !isDone(t)).length,
+      board: Store.list().filter((t) => WIP.includes(t.status)).length,
+      prioritise: Store.list().filter((t) => (t.status === 'backlog' || t.status === 'next')).length,
+      health: health.totalHits,
+      metrics: null,
+      review: null
+    };
+    $('#nav').innerHTML = VIEWS.map((v) => '<button class="nav-btn" data-view="' + v.id + '"' + (view === v.id ? ' aria-current="page"' : '') + '><span>' + v.label + '</span>' + (counts[v.id] != null ? '<span class="count' + (v.id === 'health' && counts[v.id] ? ' alert' : '') + '">' + counts[v.id] + '</span>' : '') + '</button>').join('');
+    $('#view-title').textContent = VIEWS.find((v) => v.id === view).label;
+    $('#today-label').textContent = fmtLong(now());
+  }
+
+  function renderToday() {
+    const ts = Store.list();
+    const open = ts.filter((t) => !isDone(t));
+    const focus = open.filter((t) => t.focus);
+    const overdue = open.filter((t) => t.due && daysUntil(t.due) < 0).sort((a, b) => a.due.localeCompare(b.due));
+    const dueSoon = open.filter((t) => t.due && daysUntil(t.due) >= 0 && daysUntil(t.due) <= 7).sort((a, b) => a.due.localeCompare(b.due));
+    const blocked = open.filter((t) => t.status === 'blocked');
+    const wipN = open.filter((t) => WIP.includes(t.status)).length;
+    const wipLimit = Store.settings.wip.doing + Store.settings.wip.blocked + Store.settings.wip.review;
+    const health = runHealth();
+    const doneWeek = ts.filter((t) => t.doneAt && new Date(t.doneAt) >= mondayOf(now())).length;
+    const lastReview = (Store.settings.reviews || []).slice(-1)[0];
+    const hasSample = ts.some((t) => t.sample);
+
+    let html = '';
+    if (!ts.length) {
+      html += '<div class="panel"><div class="empty"><h2 style="margin-bottom:6px">Nothing here yet</h2><p>Capture your first task above, or load a set of example tasks to see how every view behaves.</p><p style="margin-top:12px"><button class="btn primary" data-act="load-sample">Load example tasks</button></p></div></div>';
+      $('#content').innerHTML = html; return;
+    }
+    if (hasSample) html += '<div class="row small muted"><span class="chip sample">Examples</span><span>Tasks marked as examples are illustrative. Replace them from Settings &amp; data when you are ready.</span></div>';
+
+    html += '<div class="grid-4">' +
+      tile('Focus today', focus.length + ' of 3', '', focus.length > 3 ? 'warn' : '', focus.length > 3 ? 'More than three focus items dilutes the day' : 'Most important tasks') +
+      tile('Work in progress', wipN, '/ ' + wipLimit, wipN > wipLimit ? 'crit' : '', 'In progress, blocked and review') +
+      tile('Health score', health.score, '/ 100', health.score >= 80 ? 'good' : health.score >= 60 ? 'warn' : 'crit', health.totalHits + ' findings across ' + RULES.length + ' checks') +
+      tile('Done this week', doneWeek, '', '', lastReview ? 'Last review ' + fmtDate(lastReview.date) : 'No weekly review recorded yet') +
+      '</div>';
+
+    html += '<div class="grid-2">';
+    html += '<div class="panel"><div class="panel-head"><h2>Focus · most important tasks</h2><span class="small muted">Pick at most three. Finish before starting anything else.</span></div><div class="panel-body tight"><div class="tlist">' +
+      (focus.length ? focus.map((t) => taskRow(t, '<button class="btn sm ghost" data-unfocus="' + t.id + '" title="Remove from focus">Unfocus</button>')).join('') : '<div class="empty">No focus set. Open a task and switch on “Focus today”, or pick from Do first below.</div>') +
+      '</div></div></div>';
+    html += '<div class="panel"><div class="panel-head"><h2>Overdue' + (overdue.length ? ' <span class="chip q1">' + overdue.length + '</span>' : '') + '</h2><span class="small muted">Re-plan the date or renegotiate. Never leave red.</span></div><div class="panel-body tight"><div class="tlist">' +
+      (overdue.length ? overdue.map((t) => taskRow(t)).join('') : '<div class="empty">Nothing overdue.</div>') +
+      '</div></div></div>';
+    html += '</div>';
+
+    html += '<div class="grid-2">';
+    html += '<div class="panel"><div class="panel-head"><h2>Due in the next 7 days</h2></div><div class="panel-body tight"><div class="tlist">' +
+      (dueSoon.length ? dueSoon.map((t) => taskRow(t)).join('') : '<div class="empty">Nothing due this week.</div>') + '</div></div></div>';
+    html += '<div class="panel"><div class="panel-head"><h2>Waiting on others</h2><span class="small muted">Chase each one today.</span></div><div class="panel-body tight"><div class="tlist">' +
+      (blocked.length ? blocked.map((t) => taskRow(t, t.blockedReason ? '<span class="small muted">' + h(t.blockedReason) + '</span>' : '<span class="small" style="color:var(--warn)">No blocker named</span>')).join('') : '<div class="empty">Nothing blocked.</div>') + '</div></div></div>';
+    html += '</div>';
+
+    const q1Unfocused = open.filter((t) => quadrant(t) === 'q1' && !t.focus);
+    if (q1Unfocused.length) {
+      html += '<div class="panel"><div class="panel-head"><h2>Do first, not yet in focus</h2><span class="small muted">Important and urgent. Either focus them today or admit they are not urgent.</span></div><div class="panel-body tight"><div class="tlist">' +
+        q1Unfocused.map((t) => taskRow(t, '<button class="btn sm" data-focus="' + t.id + '">Focus today</button>')).join('') + '</div></div></div>';
+    }
+    $('#content').innerHTML = html;
+  }
+
+  function renderBoard() {
+    const ts = Store.list().filter((t) => !search || (t.title + ' ' + t.id + ' ' + (t.tags || []).join(' ')).toLowerCase().includes(search));
+    let html = '<div class="row"><input type="text" id="board-search" placeholder="Filter by title, id or tag" value="' + h(search) + '" style="max-width:320px" aria-label="Filter board"><span class="small muted">Drag cards between columns. Age shows days in the current column. <kbd>n</kbd> new task.</span></div>';
+    html += '<div class="board">' + STATUSES.map((s) => {
+      const items = ts.filter((t) => t.status === s.id).sort((a, b) => (quadrant(a) > quadrant(b) ? 1 : quadrant(a) < quadrant(b) ? -1 : (a.due || '9').localeCompare(b.due || '9')));
+      const lim = Store.settings.wip[s.id];
+      const over = lim && items.length > lim;
+      const shown = s.id === 'done' ? items.sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || '')).slice(0, 8) : items;
+      return '<div class="col' + (over ? ' over-limit' : '') + '" data-col="' + s.id + '"><div class="col-head"><h3 title="' + h(s.hint) + '">' + s.label + '</h3><span class="wip' + (over ? ' bad' : '') + '">' + items.length + (lim ? ' / ' + lim : '') + '</span></div>' +
+        shown.map((t) => {
+          const age = ageInStatus(t);
+          const stale = WIP.includes(t.status) && daysSince(t.updatedAt) > Store.settings.staleDays;
+          return '<div class="card' + (isDone(t) ? ' done' : '') + '" draggable="true" data-open="' + t.id + '" data-drag="' + t.id + '"><div class="stripe ' + quadrant(t) + '"></div><div class="top"><span class="tid">' + h(t.id) + '</span>' + (t.focus && !isDone(t) ? '<span class="chip focus">Focus</span>' : '') + '</div><div class="title">' + h(t.title) + '</div><div class="foot">' + chipDue(t) + (t.status === 'blocked' && t.blockedReason ? '<span class="small muted">' + h(t.blockedReason) + '</span>' : '') + '<span class="age' + (stale ? ' old' : '') + '" title="Days in this column">' + (isDone(t) ? '' : age + 'd') + '</span></div></div>';
+        }).join('') +
+        (s.id === 'done' && items.length > 8 ? '<div class="small muted" style="padding:4px">+ ' + (items.length - 8) + ' more in Metrics</div>' : '') +
+        '</div>';
+    }).join('') + '</div>';
+    $('#content').innerHTML = html;
+    const inp = $('#board-search');
+    inp.addEventListener('input', (e) => { search = e.target.value.toLowerCase(); const pos = e.target.selectionStart; renderBoard(); const n = $('#board-search'); n.focus(); n.setSelectionRange(pos, pos); });
+    bindDnD();
+  }
+
+  function bindDnD() {
+    let dragId = null;
+    document.querySelectorAll('[data-drag]').forEach((el) => {
+      el.addEventListener('dragstart', (e) => { dragId = el.dataset.drag; el.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+    });
+    document.querySelectorAll('[data-col]').forEach((col) => {
+      col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drop'); });
+      col.addEventListener('dragleave', () => col.classList.remove('drop'));
+      col.addEventListener('drop', (e) => { e.preventDefault(); col.classList.remove('drop'); if (dragId) setStatus(Store.get(dragId), col.dataset.col); dragId = null; });
+    });
+  }
+
+  function setStatus(t, status) {
+    if (!t || t.status === status) return;
+    const ts = iso(now());
+    t.status = status;
+    t.statusChangedAt = ts;
+    if (status === 'doing' && !t.startedAt) t.startedAt = ts;
+    if (status === 'done') { t.doneAt = ts; t.focus = false; } else if (t.doneAt) t.doneAt = null;
+    if (status !== 'blocked') t.blockedReason = t.blockedReason || '';
+    Store.saveTask(t);
+    if (status === 'blocked' && !t.blockedReason) openDrawer(t.id);
+  }
+
+  function renderPrioritise() {
+    const tab = Store.settings.prioTab || 'rice';
+    let html = '<div class="tabs"><button class="tab" data-tab="rice" aria-selected="' + (tab === 'rice') + '">RICE ranking</button><button class="tab" data-tab="matrix" aria-selected="' + (tab === 'matrix') + '">Eisenhower matrix</button></div>';
+    if (tab === 'rice') {
+      const rows = Store.list().filter((t) => !isDone(t)).map((t) => ({ t, s: riceScore(t) })).sort((a, b) => (b.s == null ? -1 : b.s) - (a.s == null ? -1 : a.s));
+      html += '<div class="panel"><div class="panel-head"><div><h2>RICE ranking of open work</h2><p class="small muted">Score = Reach × Impact × Confidence ÷ Effort. Edit the inputs in place. Reach is people or cases per quarter, effort is person-weeks.</p></div><span class="small muted">' + rows.filter((r) => r.s == null).length + ' unscored</span></div>' +
+        '<div class="panel-body tight" style="overflow-x:auto"><table class="data"><thead><tr><th>#</th><th>Task</th><th>Status</th><th class="num">Reach</th><th>Impact</th><th>Confidence</th><th class="num">Effort</th><th class="num">Score</th><th></th></tr></thead><tbody>' +
+        rows.map((r, i) => {
+          const t = r.t; const rc = t.rice || {};
+          return '<tr data-tid="' + t.id + '"><td class="rank">' + (r.s == null ? '—' : i + 1) + '</td><td><button class="btn ghost sm" data-open="' + t.id + '" style="font-weight:600;text-align:left;white-space:normal">' + h(t.title) + '</button></td><td class="small muted">' + statusLabel(t.status) + '</td>' +
+            '<td class="num"><input type="number" min="0" step="1" data-rice="reach" value="' + (rc.reach == null ? '' : rc.reach) + '" aria-label="Reach"></td>' +
+            '<td><select data-rice="impact" aria-label="Impact"><option value="">—</option>' + IMPACT.map((o) => '<option value="' + o.v + '"' + (rc.impact === o.v ? ' selected' : '') + '>' + o.label + '</option>').join('') + '</select></td>' +
+            '<td><select data-rice="confidence" aria-label="Confidence"><option value="">—</option>' + CONF.map((o) => '<option value="' + o.v + '"' + (rc.confidence === o.v ? ' selected' : '') + '>' + o.label + '</option>').join('') + '</select></td>' +
+            '<td class="num"><input type="number" min="0.25" step="0.25" data-rice="effort" value="' + (rc.effort == null ? '' : rc.effort) + '" aria-label="Effort in person-weeks"></td>' +
+            '<td class="num score">' + fmtScore(r.s) + '</td>' +
+            '<td><select data-status="' + t.id + '" aria-label="Status">' + STATUSES.map((s) => '<option value="' + s.id + '"' + (s.id === t.status ? ' selected' : '') + '>' + s.label + '</option>').join('') + '</select></td></tr>';
+        }).join('') + '</tbody></table></div></div>';
+    } else {
+      const open = Store.list().filter((t) => !isDone(t));
+      html += '<p class="small muted">Toggle I (important: moves an objective) and U (urgent: has a real deadline in days). A PM who lives in Schedule ships strategy; one who lives in Do first ships fire-fighting.</p>';
+      html += '<div class="matrix">' + ['q1', 'q2', 'q3', 'q4'].map((q) => {
+        const items = open.filter((t) => quadrant(t) === q);
+        return '<div class="quad ' + q + '"><h3><span>' + QUADS[q].label + '</span><span class="mono small muted">' + items.length + '</span></h3><div class="rule">' + QUADS[q].rule + '</div>' +
+          (items.length ? items.map((t) => '<div class="item"><span class="tid">' + h(t.id) + '</span><span class="t" data-open="' + t.id + '">' + h(t.title) + '</span>' +
+            '<span class="mini-toggle"><button data-flag="important" data-tid="' + t.id + '" class="' + (t.important ? 'on' : '') + '" title="Important">I</button><button data-flag="urgent" data-tid="' + t.id + '" class="' + (t.urgent ? 'on' : '') + '" title="Urgent">U</button></span></div>').join('') : '<div class="empty" style="padding:14px">Empty</div>') + '</div>';
+      }).join('') + '</div>';
+    }
+    $('#content').innerHTML = html;
+  }
+
+  function renderHealth() {
+    const hc = runHealth();
+    const cls = hc.score >= 80 ? 'good' : hc.score >= 60 ? 'warn' : 'crit';
+    const bySev = { critical: 0, warning: 0, info: 0 };
+    hc.results.forEach((r) => { bySev[r.rule.sev] += r.hits.length; });
+    let html = '<div class="health-hero"><div class="panel gauge"><span class="eyebrow">Health score</span><span class="num ' + cls + '">' + hc.score + '</span><span class="small muted">out of 100</span></div>' +
+      '<div class="panel"><div class="panel-head"><h2>What the check is looking for</h2></div><div class="panel-body" style="display:flex;flex-direction:column;gap:8px">' +
+      '<p class="ink2" style="max-width:72ch">Each rule encodes one practice from Kanban, Getting Things Done, RICE, the Eisenhower matrix, OKRs or the Scrum Definition of Done. The score starts at 100 and loses points per finding: critical 12, warning 5, info 2, capped at 30 per rule. Fix critical findings first; they are about flow and commitments.</p>' +
+      '<div class="row small"><span><span class="sev critical"></span> Critical · ' + bySev.critical + '</span><span><span class="sev warning"></span> Warning · ' + bySev.warning + '</span><span><span class="sev info"></span> Info · ' + bySev.info + '</span></div>' +
+      '</div></div></div>';
+    const order = { critical: 0, warning: 1, info: 2 };
+    const sorted = [...hc.results].sort((a, b) => (b.hits.length > 0) - (a.hits.length > 0) || order[a.rule.sev] - order[b.rule.sev]);
+    html += '<div class="panel"><div class="panel-body tight"><div class="rule-list">' + sorted.map((r) => {
+      const hit = r.hits.length > 0;
+      return '<details class="rule' + (hit ? '' : ' pass') + '"' + (hit && r.rule.sev !== 'info' ? ' open' : '') + '><summary><span class="sev ' + r.rule.sev + '"></span><span class="rname">' + r.rule.name + '</span><span class="rcount' + (hit ? ' hit' : '') + '">' + (hit ? r.hits.length + ' finding' + (r.hits.length > 1 ? 's' : '') : 'Pass') + '</span></summary>' +
+        '<div class="rbody"><p class="why">' + r.rule.why + '</p><p class="src">Source: ' + r.rule.src + '</p>' +
+        (hit ? '<div class="hit-list">' + r.hits.map((x) => x.task ? '<div class="hit"><span class="tid">' + h(x.task.id) + '</span><button data-open="' + x.task.id + '">' + h(x.task.title) + '</button><span class="detail">' + h(x.detail || '') + '</span></div>' : '<div class="hit">' + (x.column ? '<button data-goto="board">' + h(x.label) + '</button>' : '<span>' + h(x.label) + '</span>') + '</div>').join('') + '</div>' : '') +
+        '</div></details>';
+    }).join('') + '</div></div></div>';
+    $('#content').innerHTML = html;
+  }
+
+  /* ---------- charts ---------- */
+  function barChart(data, opts) {
+    // data: [{label, value, tip, hl}]
+    const W = 520, H = 200, pad = { l: 36, r: 10, t: 14, b: 28 };
+    const max = Math.max(1, ...data.map((d) => d.value));
+    const step = max <= 5 ? 1 : max <= 10 ? 2 : max <= 25 ? 5 : 10;
+    const top = Math.ceil(max / step) * step;
+    const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    const bw = iw / data.length;
+    const y = (v) => pad.t + ih - (v / top) * ih;
+    let s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + h(opts.aria) + '">';
+    s += '<g class="grid">';
+    for (let v = 0; v <= top; v += step) s += '<line x1="' + pad.l + '" x2="' + (W - pad.r) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text x="' + (pad.l - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+    s += '</g><g class="axis"><line x1="' + pad.l + '" x2="' + (W - pad.r) + '" y1="' + y(0) + '" y2="' + y(0) + '"/></g>';
+    data.forEach((d, i) => {
+      const x = pad.l + i * bw + bw * 0.2, w = bw * 0.6, hgt = Math.max(0, y(0) - y(d.value));
+      s += '<rect class="bar mark' + (d.hl ? ' hl' : '') + '" x="' + x + '" y="' + (y(d.value) - (d.value ? 0 : 0)) + '" width="' + w + '" height="' + hgt + '" rx="3" data-tip="' + h(d.tip) + '"/>';
+      s += '<text x="' + (x + w / 2) + '" y="' + (H - 10) + '" text-anchor="middle">' + h(d.label) + '</text>';
+      if (d.hl || i === data.length - 1) s += '<text class="lbl" x="' + (x + w / 2) + '" y="' + (y(d.value) - 5) + '" text-anchor="middle">' + d.value + '</text>';
+    });
+    return s + '</svg>';
+  }
+  function dotChart(items, opts) {
+    // items: [{label, value, color, tip}] horizontal dot strip; opts.ref reference value
+    const W = 520, rowH = 22, pad = { l: 150, r: 16, t: 10, b: 26 };
+    const H = pad.t + pad.b + Math.max(1, items.length) * rowH;
+    const max = Math.max(1, opts.ref || 0, ...items.map((d) => d.value));
+    const step = max <= 10 ? 2 : max <= 30 ? 5 : max <= 60 ? 10 : 20;
+    const top = Math.ceil(max / step) * step;
+    const iw = W - pad.l - pad.r;
+    const x = (v) => pad.l + (v / top) * iw;
+    let s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + h(opts.aria) + '">';
+    s += '<g class="grid">';
+    for (let v = 0; v <= top; v += step) s += '<line y1="' + pad.t + '" y2="' + (H - pad.b) + '" x1="' + x(v) + '" x2="' + x(v) + '"/><text x="' + x(v) + '" y="' + (H - 8) + '" text-anchor="middle">' + v + '</text>';
+    s += '</g>';
+    if (opts.ref) s += '<line class="ref" x1="' + x(opts.ref) + '" x2="' + x(opts.ref) + '" y1="' + pad.t + '" y2="' + (H - pad.b) + '"/><text x="' + (x(opts.ref) + 4) + '" y="' + (pad.t + 9) + '" style="fill:var(--crit)">' + h(opts.refLabel) + '</text>';
+    items.forEach((d, i) => {
+      const cy = pad.t + i * rowH + rowH / 2;
+      s += '<text x="' + (pad.l - 8) + '" y="' + (cy + 4) + '" text-anchor="end">' + h(d.label) + '</text>';
+      s += '<line x1="' + pad.l + '" x2="' + x(d.value) + '" y1="' + cy + '" y2="' + cy + '" stroke="' + d.color + '" stroke-opacity="0.35" stroke-width="2"/>';
+      s += '<circle class="mark" cx="' + x(d.value) + '" cy="' + cy + '" r="5" fill="' + d.color + '" stroke="var(--surface)" stroke-width="2" data-tip="' + h(d.tip) + '"/>';
+    });
+    if (!items.length) s += '<text x="' + (W / 2) + '" y="' + (H / 2) + '" text-anchor="middle">No data yet</text>';
+    return s + '</svg>';
+  }
+
+  function renderMetrics() {
+    const ts = Store.list();
+    const done = ts.filter((t) => t.doneAt);
+    const weeks = [];
+    for (let i = 7; i >= 0; i--) { const m = mondayOf(now()); m.setDate(m.getDate() - i * 7); weeks.push(m); }
+    const thr = weeks.map((m, i) => { const e = new Date(m); e.setDate(e.getDate() + 7); const n = done.filter((t) => new Date(t.doneAt) >= m && new Date(t.doneAt) < e).length; return { label: (i === 7 ? 'This wk' : ymd(m).slice(5)), value: n, tip: 'Week of ' + fmtDate(ymd(m)) + ': ' + n + ' done', hl: i === 7 }; });
+    const last4 = thr.slice(4).reduce((a, d) => a + d.value, 0);
+    const prev4 = thr.slice(0, 4).reduce((a, d) => a + d.value, 0);
+    const cycles = done.map((t) => cycleDays(t)).filter((x) => x != null);
+    const med = median(cycles), p85 = pct(cycles, 0.85);
+    const withDue = done.filter((t) => t.due);
+    const onTime = withDue.filter((t) => ymd(t.doneAt) <= t.due).length;
+    const wipItems = ts.filter((t) => WIP.includes(t.status)).map((t) => ({ t, age: Math.max(0, daysBetween(new Date(t.startedAt || t.statusChangedAt || t.createdAt), now())) })).sort((a, b) => b.age - a.age);
+    const colorFor = (st) => st === 'doing' ? 'var(--s1)' : st === 'review' ? 'var(--s3)' : 'var(--s2)';
+    const quadCounts = ['q1', 'q2', 'q3', 'q4'].map((q) => ({ label: QUADS[q].label, value: ts.filter((t) => !isDone(t) && quadrant(t) === q).length, tip: QUADS[q].label }));
+    const objCounts = (Store.settings.objectives || []).map((o) => ({ o, n: ts.filter((t) => !isDone(t) && t.objective === o).length }));
+    const unlinked = ts.filter((t) => !isDone(t) && !(t.objective || '').trim()).length;
+
+    let html = '<div class="grid-4">' +
+      tile('Throughput · last 4 weeks', last4, 'done', '', prev4 ? (last4 >= prev4 ? '+' : '') + (last4 - prev4) + ' vs previous 4 weeks' : 'No earlier baseline') +
+      tile('Median cycle time', med == null ? '—' : med, med == null ? '' : 'days', '', p85 != null ? '85th percentile ' + p85 + ' days' : 'Start to done') +
+      tile('Aged work in progress', wipItems.filter((w) => p85 != null && w.age > p85).length, '', wipItems.some((w) => p85 != null && w.age > p85) ? 'warn' : '', 'Items older than your 85th percentile') +
+      tile('On-time delivery', withDue.length ? Math.round(100 * onTime / withDue.length) + '%' : '—', '', withDue.length && onTime / withDue.length < 0.7 ? 'warn' : '', withDue.length ? onTime + ' of ' + withDue.length + ' done tasks with a date' : 'No dated tasks completed') +
+      '</div>';
+
+    html += '<div class="grid-2">';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Throughput per week</h2><p class="small muted">Tasks moved to Done. Stable beats high.</p></div></div><div class="panel-body">' + barChart(thr, { aria: 'Throughput per week' }) + '</div></div>';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Aging work in progress</h2><p class="small muted">Days since start. Anything past the 85th-percentile line is at risk of becoming your longest task ever.</p></div></div><div class="panel-body">' +
+      '<div class="legend" style="margin-bottom:8px"><span><span class="sw" style="background:var(--s1)"></span>In progress</span><span><span class="sw" style="background:var(--s2)"></span>Blocked</span><span><span class="sw" style="background:var(--s3)"></span>In review</span></div>' +
+      dotChart(wipItems.map((w) => ({ label: w.t.id + " " + w.t.title.slice(0, 13), value: w.age, color: colorFor(w.t.status), tip: w.t.title + ' · ' + w.age + ' days · ' + statusLabel(w.t.status) })), { aria: 'Aging work in progress', ref: p85, refLabel: p85 != null ? 'P85 ' + p85 + 'd' : '' }) + '</div></div>';
+    html += '</div>';
+
+    html += '<div class="grid-2">';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Cycle time of completed tasks</h2><p class="small muted">Start to done, in days. Use the 85th percentile as your forecast, not the average.</p></div></div><div class="panel-body">' +
+      dotChart(done.sort((a, b) => cycleDays(b) - cycleDays(a)).slice(0, 12).map((t) => ({ label: t.id + " " + t.title.slice(0, 13), value: cycleDays(t), color: 'var(--s1)', tip: t.title + ' · ' + cycleDays(t) + ' days' })), { aria: 'Cycle time per task', ref: p85, refLabel: p85 != null ? 'P85 ' + p85 + 'd' : '' }) + '</div></div>';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Where open work sits</h2><p class="small muted">By Eisenhower quadrant, and by objective.</p></div></div><div class="panel-body">' + barChart(quadCounts, { aria: 'Open tasks by quadrant' }) +
+      '<table class="data" style="margin-top:10px"><thead><tr><th>Objective</th><th class="num">Open tasks</th></tr></thead><tbody>' + objCounts.map((x) => '<tr><td>' + h(x.o) + '</td><td class="num">' + x.n + '</td></tr>').join('') + '<tr><td class="muted">Not linked to an objective</td><td class="num">' + unlinked + '</td></tr></tbody></table></div></div>';
+    html += '</div>';
+    $('#content').innerHTML = html;
+    bindTooltips();
+  }
+
+  function bindTooltips() {
+    const tip = $('#tooltip');
+    document.querySelectorAll('[data-tip]').forEach((el) => {
+      el.addEventListener('mouseenter', () => { tip.textContent = el.dataset.tip; tip.style.display = 'block'; });
+      el.addEventListener('mousemove', (e) => { tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY + 12) + 'px'; });
+      el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    });
+  }
+
+  const REVIEW_STEPS = [
+    { id: 'capture', t: 'Capture every loose end', d: 'Emails, meeting notes, Slack threads. Anything you are holding in your head goes into the backlog via the capture bar.' },
+    { id: 'overdue', t: 'Clear the overdue list', d: 'For each overdue task: re-plan the date, renegotiate with the stakeholder, or drop it. None stays red.' },
+    { id: 'blocked', t: 'Chase every blocked item', d: 'Name the blocker, send the chase, and decide whether to escalate or swap the dependency.' },
+    { id: 'wip', t: 'Walk the board right to left', d: 'Finish before starting. Can anything in Review be closed? Is anything in Progress secretly stalled?' },
+    { id: 'dod', t: 'Check Done against its Definition of Done', d: 'Anything closed with open checklist items either gets finished or the item is removed from the definition.' },
+    { id: 'backlog', t: 'Prune the backlog', d: 'Items untouched for a month are decisions being avoided. Schedule them, or delete them.' },
+    { id: 'score', t: 'Re-score Next with RICE', d: 'Reach, impact, confidence and effort change as you learn. Re-rank before you commit the week.' },
+    { id: 'objectives', t: 'Check time against objectives', d: 'Metrics view: is open work spread across your objectives, or piling up on one while another starves?' },
+    { id: 'focus', t: 'Choose next week’s three focus tasks', d: 'Mark them as Focus. Three, not seven.' }
+  ];
+
+  function buildReport() {
+    const ts = Store.list();
+    const monday = mondayOf(now());
+    const nextMonday = new Date(monday); nextMonday.setDate(monday.getDate() + 7);
+    const doneWeek = ts.filter((t) => t.doneAt && new Date(t.doneAt) >= monday);
+    const carried = ts.filter((t) => WIP.includes(t.status));
+    const blocked = ts.filter((t) => t.status === 'blocked');
+    const focus = ts.filter((t) => t.focus && !isDone(t));
+    const hc = runHealth();
+    const line = (t, extra) => '  • ' + t.id + '  ' + t.title + (extra ? '  (' + extra + ')' : '');
+    let r = 'WEEKLY REVIEW · week of ' + fmtDate(ymd(monday)) + ' · ' + fmtLong(now()) + '\n\n';
+    r += 'DONE THIS WEEK (' + doneWeek.length + ')\n' + (doneWeek.map((t) => line(t, t.objective)).join('\n') || '  —') + '\n\n';
+    r += 'CARRIED OVER (' + carried.length + ')\n' + (carried.map((t) => line(t, statusLabel(t.status) + ', ' + ageInStatus(t) + 'd in column' + (t.due ? ', due ' + fmtDate(t.due) : ''))).join('\n') || '  —') + '\n\n';
+    r += 'BLOCKED / WAITING (' + blocked.length + ')\n' + (blocked.map((t) => line(t, t.blockedReason || 'blocker not named')).join('\n') || '  —') + '\n\n';
+    r += 'NEXT WEEK’S FOCUS (' + focus.length + ')\n' + (focus.map((t) => line(t, t.due ? 'due ' + fmtDate(t.due) : '')).join('\n') || '  — none chosen yet') + '\n\n';
+    r += 'HEALTH · ' + hc.score + '/100 · ' + hc.totalHits + ' findings\n' + hc.results.filter((x) => x.hits.length).map((x) => '  • ' + x.rule.name + ': ' + x.hits.length).join('\n') + '\n';
+    if (Store.settings.review.focus) r += '\nNOTES\n' + Store.settings.review.focus + '\n';
+    return r;
+  }
+
+  function renderReview() {
+    const wk = weekKey(now());
+    const rv = Store.settings.review || { week: '', checks: {}, focus: '' };
+    if (rv.week !== wk) { rv.week = wk; rv.checks = {}; rv.focus = ''; Store.settings.review = rv; Store.saveSettings(); }
+    const doneSteps = REVIEW_STEPS.filter((s) => rv.checks[s.id]).length;
+    const reviews = Store.settings.reviews || [];
+    let html = '<div class="grid-2">';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Review ritual</h2><p class="small muted">Once a week, same slot. About 30 minutes.</p></div><span class="mono small muted">' + doneSteps + ' / ' + REVIEW_STEPS.length + '</span></div><div class="panel-body tight"><div class="checklist">' +
+      REVIEW_STEPS.map((s) => '<label><input type="checkbox" data-step="' + s.id + '"' + (rv.checks[s.id] ? ' checked' : '') + '><span><span class="ct">' + s.t + '</span><br><span class="cd">' + s.d + '</span></span></label>').join('') +
+      '</div></div><div class="panel-body" style="border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px"><label class="field">Notes for the report<textarea id="review-notes" placeholder="Decisions taken, dates renegotiated, what you will stop doing">' + h(rv.focus) + '</textarea></label>' +
+      '<div class="row"><button class="btn primary" data-act="complete-review"' + (doneSteps < REVIEW_STEPS.length ? ' disabled title="Tick every step first"' : '') + '>Record this week’s review</button><span class="small muted">' + (reviews.length ? 'Last recorded ' + fmtDate(reviews[reviews.length - 1].date) + ' · ' + reviews.length + ' on file' : 'No review recorded yet') + '</span></div></div></div>';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Status report</h2><p class="small muted">Generated from the board. Paste into your update or stakeholder note.</p></div><button class="btn sm" data-act="copy-report">Copy</button></div><div class="panel-body"><div class="report" id="report">' + h(buildReport()) + '</div></div></div>';
+    html += '</div>';
+    if (reviews.length) {
+      html += '<div class="panel"><div class="panel-head"><h2>Review history</h2></div><div class="panel-body tight" style="overflow-x:auto"><table class="data"><thead><tr><th>Date</th><th class="num">Done that week</th><th class="num">Carried over</th><th class="num">Blocked</th><th class="num">Health</th></tr></thead><tbody>' +
+        reviews.slice().reverse().map((r) => '<tr><td class="mono">' + fmtDate(r.date) + '</td><td class="num">' + r.done + '</td><td class="num">' + r.carried + '</td><td class="num">' + r.blocked + '</td><td class="num">' + r.health + '</td></tr>').join('') + '</tbody></table></div></div>';
+    }
+    $('#content').innerHTML = html;
+  }
+
+  function render() {
+    renderNav();
+    ({ today: renderToday, board: renderBoard, prioritise: renderPrioritise, health: renderHealth, metrics: renderMetrics, review: renderReview }[view])();
+  }
+
+  /* ================= drawer ================= */
+  function blankTask(title) {
+    const ts = iso(now());
+    return { id: Store.newId(), title: title || '', why: '', objective: '', status: 'backlog', important: false, urgent: false, rice: { reach: null, impact: null, confidence: null, effort: null }, due: '', stakeholder: '', tags: [], dod: [], notes: '', blockedReason: '', focus: false, sample: false, createdAt: ts, updatedAt: ts, statusChangedAt: ts, startedAt: null, doneAt: null };
+  }
+  let draft = null;
+  function openDrawer(id) {
+    const src = id ? Store.get(id) : null;
+    draft = src ? JSON.parse(JSON.stringify(src)) : blankTask('');
+    draft.dod = draft.dod || [];
+    draft.rice = draft.rice || {};
+    if (!src) draft._new = true;
+    drawDrawer();
+  }
+  function drawDrawer() {
+    const t = draft; const rc = t.rice;
+    const objs = Store.settings.objectives || [];
+    const score = riceScore(t);
+    $('#overlay').innerHTML = '<div class="scrim" data-close></div><aside class="drawer" role="dialog" aria-label="Task">' +
+      '<div class="drawer-head"><span class="mono small muted">' + h(t.id) + '</span><h2 class="grow">' + (t._new ? 'New task' : 'Edit task') + '</h2>' + (t.sample ? '<span class="chip sample">Example</span>' : '') + '<button class="btn icon ghost" data-close aria-label="Close">✕</button></div>' +
+      '<div class="drawer-body">' +
+      '<label class="field">Title · verb + object<input type="text" data-f="title" value="' + h(t.title) + '" placeholder="Draft, Decide, Ship, Review, Align…"></label>' +
+      '<label class="field">Why · which outcome does this move?<textarea data-f="why" placeholder="The metric, risk or decision this task changes. If you cannot write one, question the task.">' + h(t.why) + '</textarea></label>' +
+      '<div class="grid-2"><label class="field">Objective<select data-f="objective"><option value="">— none —</option>' + objs.map((o) => '<option' + (o === t.objective ? ' selected' : '') + '>' + h(o) + '</option>').join('') + '</select></label>' +
+      '<label class="field">Status<select data-f="status">' + STATUSES.map((s) => '<option value="' + s.id + '"' + (s.id === t.status ? ' selected' : '') + '>' + s.label + '</option>').join('') + '</select></label></div>' +
+      '<div class="fieldset"><span class="eyebrow">Eisenhower</span><div class="row"><label class="check"><input type="checkbox" data-f="important"' + (t.important ? ' checked' : '') + '> Important · moves an objective</label><label class="check"><input type="checkbox" data-f="urgent"' + (t.urgent ? ' checked' : '') + '> Urgent · real deadline within days</label><span class="grow"></span>' + chipQuad(t) + '</div></div>' +
+      '<div class="fieldset"><span class="eyebrow">RICE score</span><div class="rice-grid">' +
+      '<label class="field">Reach / quarter<input type="number" min="0" data-r="reach" value="' + (rc.reach == null ? '' : rc.reach) + '"></label>' +
+      '<label class="field">Impact<select data-r="impact"><option value="">—</option>' + IMPACT.map((o) => '<option value="' + o.v + '"' + (rc.impact === o.v ? ' selected' : '') + '>' + o.label + '</option>').join('') + '</select></label>' +
+      '<label class="field">Confidence<select data-r="confidence"><option value="">—</option>' + CONF.map((o) => '<option value="' + o.v + '"' + (rc.confidence === o.v ? ' selected' : '') + '>' + o.label + '</option>').join('') + '</select></label>' +
+      '<label class="field">Effort · person-weeks<input type="number" min="0.25" step="0.25" data-r="effort" value="' + (rc.effort == null ? '' : rc.effort) + '"></label></div>' +
+      '<div class="rice-out"><span class="v" id="rice-live">' + fmtScore(score) + '</span><span>Reach × Impact × Confidence ÷ Effort</span></div></div>' +
+      '<div class="grid-2"><label class="field">Target date<input type="date" data-f="due" value="' + h(t.due) + '"></label><label class="field">Stakeholder / owner on the other side<input type="text" data-f="stakeholder" value="' + h(t.stakeholder) + '" placeholder="Who cares, who unblocks"></label></div>' +
+      '<label class="field">Tags · comma separated<input type="text" data-f="tags" value="' + h((t.tags || []).join(', ')) + '"></label>' +
+      '<label class="field">Blocked by · who or what are you waiting on?<input type="text" data-f="blockedReason" value="' + h(t.blockedReason) + '" placeholder="Required when status is Blocked"></label>' +
+      '<div class="fieldset"><span class="eyebrow">Definition of Done</span><div class="dod">' + t.dod.map((d, i) => '<div class="dod-item"><input type="checkbox" data-dod-done="' + i + '"' + (d.done ? ' checked' : '') + '><input type="text" data-dod-text="' + i + '" value="' + h(d.text) + '"><button class="btn icon ghost" data-dod-del="' + i + '" aria-label="Remove">✕</button></div>').join('') + '</div><div><button class="btn sm" data-dod-add>+ Add criterion</button></div></div>' +
+      '<label class="field">Notes<textarea data-f="notes">' + h(t.notes) + '</textarea></label>' +
+      '<label class="check"><input type="checkbox" data-f="focus"' + (t.focus ? ' checked' : '') + '> Focus today · one of at most three</label>' +
+      (t._new ? '' : '<p class="small muted mono">Created ' + fmtDate(t.createdAt) + (t.startedAt ? ' · started ' + fmtDate(t.startedAt) : '') + (t.doneAt ? ' · done ' + fmtDate(t.doneAt) : '') + ' · in column ' + ageInStatus(t) + 'd</p>') +
+      '</div>' +
+      '<div class="drawer-foot"><button class="btn primary" data-save>Save</button><button class="btn" data-close>Cancel</button><span class="grow"></span>' + (t._new ? '' : '<button class="btn danger" data-delete>Delete</button>') + '</div></aside>';
+    const body = $('.drawer-body');
+    body.addEventListener('input', onDraftInput);
+    body.addEventListener('change', onDraftInput);
+    setTimeout(() => { const f = $('.drawer [data-f="title"]'); if (f && t._new) f.focus(); }, 30);
+  }
+  function onDraftInput(e) {
+    const el = e.target; const t = draft;
+    if (el.dataset.f) {
+      const f = el.dataset.f;
+      if (el.type === 'checkbox') t[f] = el.checked;
+      else if (f === 'tags') t.tags = el.value.split(',').map((x) => x.trim()).filter(Boolean);
+      else t[f] = el.value;
+      if (f === 'important' || f === 'urgent') { const c = $('.drawer .fieldset .chip'); if (c) c.outerHTML = chipQuad(t); }
+    } else if (el.dataset.r) {
+      const v = el.value === '' ? null : Number(el.value);
+      t.rice[el.dataset.r] = v;
+      $('#rice-live').textContent = fmtScore(riceScore(t));
+    } else if (el.dataset.dodText != null) { t.dod[Number(el.dataset.dodText)].text = el.value; }
+    else if (el.dataset.dodDone != null) { t.dod[Number(el.dataset.dodDone)].done = el.checked; }
+  }
+  function saveDraft() {
+    const t = draft;
+    if (!t.title.trim()) { toast('Give the task a title'); return; }
+    const prev = Store.get(t.id);
+    const prevStatus = prev ? prev.status : 'backlog';
+    if (t.status !== prevStatus) {
+      const ts = iso(now());
+      t.statusChangedAt = ts;
+      if (t.status === 'doing' && !t.startedAt) t.startedAt = ts;
+      if (t.status === 'done') { t.doneAt = ts; t.focus = false; } else t.doneAt = null;
+    }
+    if (t.status === 'blocked' && !(t.blockedReason || '').trim()) { toast('Name the blocker before marking as blocked'); return; }
+    t.dod = t.dod.filter((d) => d.text.trim());
+    delete t._new;
+    closeOverlay();
+    Store.saveTask(t);
+    toast('Saved ' + t.id);
+  }
+  function closeOverlay() { $('#overlay').innerHTML = ''; draft = null; }
+
+  /* ================= settings modal ================= */
+  function openSettings() {
+    const s = Store.settings;
+    $('#overlay').innerHTML = '<div class="scrim" data-close></div><div class="modal"><div class="modal-box" role="dialog" aria-label="Settings and data">' +
+      '<div class="drawer-head"><h2 class="grow">Settings &amp; data</h2><button class="btn icon ghost" data-close aria-label="Close">✕</button></div>' +
+      '<div class="drawer-body">' +
+      '<div class="fieldset"><span class="eyebrow">Work-in-progress limits</span><p class="small muted">Personal Kanban suggests three in progress. Limits on Next keep the commitment queue honest.</p><div class="rice-grid">' +
+      ['next', 'doing', 'blocked', 'review'].map((c) => '<label class="field">' + statusLabel(c) + '<input type="number" min="1" data-wip="' + c + '" value="' + s.wip[c] + '"></label>').join('') + '</div></div>' +
+      '<div class="fieldset"><span class="eyebrow">Health thresholds · days</span><div class="grid-3">' +
+      '<label class="field">Stale after<input type="number" min="1" data-s="staleDays" value="' + s.staleDays + '"></label>' +
+      '<label class="field">Blocked too long after<input type="number" min="1" data-s="blockedDays" value="' + s.blockedDays + '"></label>' +
+      '<label class="field">Backlog untouched after<input type="number" min="7" data-s="backlogAgeDays" value="' + s.backlogAgeDays + '"></label></div></div>' +
+      '<div class="fieldset"><span class="eyebrow">Objectives · one per line</span><p class="small muted">Your current OKRs or quarterly goals. Tasks link to one of these.</p><textarea id="objectives" style="min-height:90px">' + h((s.objectives || []).join('\n')) + '</textarea></div>' +
+      '<div class="fieldset"><span class="eyebrow">Data</span><div class="row">' +
+      '<button class="btn" data-act="export-json">Export JSON backup</button><button class="btn" data-act="export-csv">Export CSV for Jira / Sheets</button>' +
+      '<label class="btn" style="cursor:pointer">Import JSON<input type="file" id="import-file" accept="application/json" style="display:none"></label></div>' +
+      '<div class="row"><button class="btn" data-act="load-sample">Load example tasks</button><button class="btn danger" data-act="clear-sample">Remove example tasks</button><button class="btn danger" data-act="clear-all">Delete everything</button></div>' +
+      '<p class="small muted">' + (Store.mode === 'db' ? 'Tasks are stored with this page in your Claude workspace and update live wherever you open it.' : 'Tasks are stored in this browser only. Export a backup before clearing site data or switching devices.') + '</p></div>' +
+      '</div><div class="drawer-foot"><button class="btn primary" data-save-settings>Save settings</button><button class="btn" data-close>Close</button></div></div></div>';
+    $('#import-file').addEventListener('change', importJson);
+  }
+  function saveSettingsFromModal() {
+    const s = Store.settings;
+    document.querySelectorAll('[data-wip]').forEach((el) => { s.wip[el.dataset.wip] = Math.max(1, Number(el.value) || 1); });
+    document.querySelectorAll('[data-s]').forEach((el) => { s[el.dataset.s] = Math.max(1, Number(el.value) || 1); });
+    s.objectives = $('#objectives').value.split('\n').map((x) => x.trim()).filter(Boolean);
+    Store.saveSettings();
+    closeOverlay(); render(); toast('Settings saved');
+  }
+  function download(name, text, type) {
+    const blob = new Blob([text], { type: type || 'text/plain' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function exportJson() { download('pm-flightdeck-' + todayYmd() + '.json', JSON.stringify({ exportedAt: iso(now()), settings: Store.settings, tasks: Store.list() }, null, 2), 'application/json'); }
+  function exportCsv() {
+    const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const head = ['Issue key', 'Summary', 'Description', 'Status', 'Priority', 'Due date', 'Labels', 'Objective', 'Stakeholder', 'RICE score', 'Reach', 'Impact', 'Confidence', 'Effort', 'Created', 'Started', 'Done'];
+    const prio = { q1: 'Highest', q2: 'High', q3: 'Medium', q4: 'Low' };
+    const rows = Store.list().map((t) => [t.id, t.title, (t.why ? 'Why: ' + t.why + '\n' : '') + (t.notes || ''), statusLabel(t.status), prio[quadrant(t)], t.due, (t.tags || []).join(' '), t.objective, t.stakeholder, fmtScore(riceScore(t)), t.rice && t.rice.reach, t.rice && t.rice.impact, t.rice && t.rice.confidence, t.rice && t.rice.effort, ymd(t.createdAt), t.startedAt ? ymd(t.startedAt) : '', t.doneAt ? ymd(t.doneAt) : ''].map(esc).join(','));
+    download('pm-flightdeck-' + todayYmd() + '.csv', head.map(esc).join(',') + '\n' + rows.join('\n'), 'text/csv');
+  }
+  function importJson(e) {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const data = JSON.parse(rd.result);
+        const tasks = Array.isArray(data.tasks) ? data.tasks : Object.values(data.tasks || {});
+        if (!tasks.length) throw new Error('No tasks found in file');
+        if (!confirm('Replace the current ' + Store.list().length + ' tasks with ' + tasks.length + ' from this file?')) return;
+        closeOverlay();
+        Store.replaceAll(tasks, data.settings);
+        toast('Imported ' + tasks.length + ' tasks');
+      } catch (err) { toast('Import failed: ' + err.message); }
+    };
+    rd.readAsText(f);
+  }
+  function loadSample() {
+    const existing = Store.list().filter((t) => !t.sample);
+    const ids = new Set(existing.map((t) => t.id));
+    const samples = sampleTasks().filter((t) => !ids.has(t.id));
+    Store.settings.sampleLoaded = true;
+    Store.settings.seq = Math.max(Store.settings.seq || 1, 17);
+    Store.replaceAll(existing.concat(samples), Store.settings);
+    closeOverlay(); toast('Example tasks loaded');
+  }
+
+  /* ================= events ================= */
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-view],[data-open],[data-close],[data-save],[data-delete],[data-act],[data-tab],[data-flag],[data-focus],[data-unfocus],[data-dod-add],[data-dod-del],[data-save-settings],[data-goto],#btn-settings');
+    if (!el) return;
+    if (el.id === 'btn-settings') { openSettings(); return; }
+    if (el.dataset.view) { view = el.dataset.view; render(); return; }
+    if (el.dataset.goto) { view = el.dataset.goto; render(); return; }
+    if (el.dataset.open != null && !e.target.closest('[data-unfocus],[data-focus],[data-flag],select,input')) { openDrawer(el.dataset.open); return; }
+    if (el.hasAttribute('data-close')) { closeOverlay(); return; }
+    if (el.hasAttribute('data-save')) { saveDraft(); return; }
+    if (el.hasAttribute('data-save-settings')) { saveSettingsFromModal(); return; }
+    if (el.hasAttribute('data-delete')) { if (confirm('Delete ' + draft.id + '? This cannot be undone.')) { const id = draft.id; closeOverlay(); Store.deleteTask(id); toast('Deleted ' + id); } return; }
+    if (el.hasAttribute('data-dod-add')) { draft.dod.push({ text: '', done: false }); drawDrawer(); setTimeout(() => { const all = document.querySelectorAll('[data-dod-text]'); if (all.length) all[all.length - 1].focus(); }, 20); return; }
+    if (el.dataset.dodDel != null) { draft.dod.splice(Number(el.dataset.dodDel), 1); drawDrawer(); return; }
+    if (el.dataset.tab) { Store.settings.prioTab = el.dataset.tab; Store.saveSettings(); render(); return; }
+    if (el.dataset.flag) { const t = Store.get(el.dataset.tid); t[el.dataset.flag] = !t[el.dataset.flag]; Store.saveTask(t); return; }
+    if (el.dataset.focus) { const t = Store.get(el.dataset.focus); const n = Store.list().filter((x) => x.focus && !isDone(x)).length; if (n >= 3) { toast('Three focus tasks already. Unfocus one first.'); return; } t.focus = true; Store.saveTask(t); return; }
+    if (el.dataset.unfocus) { const t = Store.get(el.dataset.unfocus); t.focus = false; Store.saveTask(t); return; }
+    if (el.dataset.act) {
+      const a = el.dataset.act;
+      if (a === 'load-sample') loadSample();
+      else if (a === 'clear-sample') { if (confirm('Remove all example tasks?')) { Store.replaceAll(Store.list().filter((t) => !t.sample), Store.settings); closeOverlay(); toast('Examples removed'); } }
+      else if (a === 'clear-all') { if (confirm('Delete every task and reset settings? Export a backup first if in doubt.')) { Store.replaceAll([], JSON.parse(JSON.stringify(DEFAULT_SETTINGS))); closeOverlay(); toast('Cleared'); } }
+      else if (a === 'export-json') exportJson();
+      else if (a === 'export-csv') exportCsv();
+      else if (a === 'copy-report') { const txt = buildReport(); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast('Report copied'), () => { const r = document.createRange(); r.selectNodeContents($('#report')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Select and copy the report text'); }); }
+      else if (a === 'complete-review') {
+        const ts = Store.list(); const hc = runHealth(); const monday = mondayOf(now());
+        Store.settings.reviews = (Store.settings.reviews || []).concat([{ date: iso(now()), done: ts.filter((t) => t.doneAt && new Date(t.doneAt) >= monday).length, carried: ts.filter((t) => WIP.includes(t.status)).length, blocked: ts.filter((t) => t.status === 'blocked').length, health: hc.score }]).slice(-52);
+        Store.saveSettings(); render(); toast('Review recorded');
+      }
+    }
+  });
+  document.addEventListener('change', (e) => {
+    const el = e.target;
+    if (el.dataset.rice) { const tr = el.closest('tr'); const t = Store.get(tr.dataset.tid); t.rice = t.rice || {}; t.rice[el.dataset.rice] = el.value === '' ? null : Number(el.value); Store.saveTask(t); return; }
+    if (el.dataset.status) { setStatus(Store.get(el.dataset.status), el.value); return; }
+    if (el.dataset.step) { Store.settings.review.checks[el.dataset.step] = el.checked; Store.saveSettings(); render(); return; }
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'review-notes') { Store.settings.review.focus = e.target.value; clearTimeout(window.__rn); window.__rn = setTimeout(() => { Store.saveSettings(); $('#report').textContent = buildReport(); }, 400); }
+  });
+  $('#capture-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inp = $('#capture-input'); const title = inp.value.trim(); if (!title) return;
+    const t = blankTask(title);
+    Store.saveTask(t);
+    inp.value = '';
+    toast('Captured ' + t.id + ' in Backlog');
+  });
+  document.addEventListener('keydown', (e) => {
+    const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+    if (e.key === 'Escape' && $('#overlay').children.length) { closeOverlay(); return; }
+    if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'n') { e.preventDefault(); openDrawer(null); }
+    if (e.key === '/') { e.preventDefault(); $('#capture-input').focus(); }
+  });
+
+  /* ================= init ================= */
+  const had = Store.loadLocal();
+  if (!had && !Store.list().length) {
+    // First open in this browser: seed with examples so every view is legible.
+    Store.settings.sampleLoaded = true;
+    Store.settings.seq = 17;
+    sampleTasks().forEach((t) => { Store.tasks[t.id] = t; });
+    Store.persistLocal();
+  }
+  render();
+  Store.connectDb();
+})();
+</script>

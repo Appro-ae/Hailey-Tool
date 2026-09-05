@@ -1,0 +1,581 @@
+{
+  "note": "Example tasks used by PM Flightdeck. Dates are relative to the generation date.",
+  "generatedOn": "2026-09-05",
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "Ship eKYC retry flow for failed liveness checks",
+      "why": "Liveness failures are 31% of onboarding drop-off; a retry with guidance recovers a share of them.",
+      "objective": "Cut onboarding drop-off",
+      "status": "doing",
+      "important": true,
+      "urgent": true,
+      "rice": {
+        "reach": 1800,
+        "impact": 2,
+        "confidence": 80,
+        "effort": 3
+      },
+      "due": "2026-09-07",
+      "stakeholder": "Eng lead · Compliance",
+      "tags": [
+        "onboarding",
+        "kyc"
+      ],
+      "dod": [
+        {
+          "text": "Retry UX approved by Compliance",
+          "done": true
+        },
+        {
+          "text": "Funnel event instrumented",
+          "done": false
+        },
+        {
+          "text": "Release note published",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": true,
+      "sample": true,
+      "createdAt": "2026-08-12T10:00:00.000Z",
+      "updatedAt": "2026-09-04T10:00:00.000Z",
+      "statusChangedAt": "2026-08-30T10:00:00.000Z",
+      "startedAt": "2026-08-30T10:00:00.000Z",
+      "doneAt": null
+    },
+    {
+      "id": "T-002",
+      "title": "Define success metrics for SME onboarding funnel",
+      "why": "Without a baseline the v2 launch cannot be judged. Needed before design starts.",
+      "objective": "Ship SME onboarding v2",
+      "status": "doing",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 600,
+        "impact": 3,
+        "confidence": 80,
+        "effort": 1
+      },
+      "due": "2026-09-10",
+      "stakeholder": "Head of Product · Data",
+      "tags": [
+        "sme",
+        "analytics"
+      ],
+      "dod": [
+        {
+          "text": "North-star and 3 guardrail metrics agreed",
+          "done": false
+        },
+        {
+          "text": "Dashboard spec handed to Data",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": true,
+      "sample": true,
+      "createdAt": "2026-08-21T10:00:00.000Z",
+      "updatedAt": "2026-08-28T10:00:00.000Z",
+      "statusChangedAt": "2026-08-27T10:00:00.000Z",
+      "startedAt": "2026-08-27T10:00:00.000Z",
+      "doneAt": null
+    },
+    {
+      "id": "T-003",
+      "title": "Review SLA with KYC vendor before renewal",
+      "why": "Contract renews in 3 weeks; P95 verification time has doubled since Q1.",
+      "objective": "Reduce KYC cost per case",
+      "status": "blocked",
+      "important": true,
+      "urgent": true,
+      "rice": {
+        "reach": 5000,
+        "impact": 2,
+        "confidence": 100,
+        "effort": 1
+      },
+      "due": "2026-09-03",
+      "stakeholder": "Procurement · Vendor AM",
+      "tags": [
+        "kyc",
+        "vendor"
+      ],
+      "dod": [
+        {
+          "text": "Vendor P95 report received",
+          "done": false
+        },
+        {
+          "text": "Renewal recommendation sent to CFO",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-06T10:00:00.000Z",
+      "updatedAt": "2026-08-31T10:00:00.000Z",
+      "statusChangedAt": "2026-08-31T10:00:00.000Z",
+      "startedAt": "2026-08-24T10:00:00.000Z",
+      "doneAt": null
+    },
+    {
+      "id": "T-004",
+      "title": "Write PRD for document upload fallback (manual review)",
+      "why": "Customers with unsupported ID types have no path today; support tickets rising.",
+      "objective": "Cut onboarding drop-off",
+      "status": "next",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 400,
+        "impact": 1,
+        "confidence": 80,
+        "effort": 2
+      },
+      "due": "2026-09-14",
+      "stakeholder": "Ops lead",
+      "tags": [
+        "onboarding"
+      ],
+      "dod": [
+        {
+          "text": "PRD reviewed by Eng and Ops",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-26T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z",
+      "statusChangedAt": "2026-09-02T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    },
+    {
+      "id": "T-005",
+      "title": "Prepare Q4 roadmap narrative for exec review",
+      "why": "Exec review on the 18th decides headcount for onboarding squad.",
+      "objective": "Ship SME onboarding v2",
+      "status": "next",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 20,
+        "impact": 3,
+        "confidence": 50,
+        "effort": 1.5
+      },
+      "due": "2026-09-17",
+      "stakeholder": "CPO",
+      "tags": [
+        "roadmap"
+      ],
+      "dod": [
+        {
+          "text": "One-page narrative",
+          "done": false
+        },
+        {
+          "text": "Options with cost/impact",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-29T10:00:00.000Z",
+      "updatedAt": "2026-08-29T10:00:00.000Z",
+      "statusChangedAt": "2026-08-29T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    },
+    {
+      "id": "T-006",
+      "title": "Answer sales request for custom onboarding demo",
+      "why": "",
+      "objective": "",
+      "status": "next",
+      "important": false,
+      "urgent": true,
+      "rice": {
+        "reach": 5,
+        "impact": 0.5,
+        "confidence": 80,
+        "effort": 0.5
+      },
+      "due": "2026-09-06",
+      "stakeholder": "Sales director",
+      "tags": [
+        "request"
+      ],
+      "dod": [],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-09-03T10:00:00.000Z",
+      "updatedAt": "2026-09-03T10:00:00.000Z",
+      "statusChangedAt": "2026-09-03T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    },
+    {
+      "id": "T-007",
+      "title": "Benchmark competitor onboarding time-to-first-transaction",
+      "why": "Board asked how we compare; informs the v2 target.",
+      "objective": "Ship SME onboarding v2",
+      "status": "backlog",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 50,
+        "impact": 1,
+        "confidence": 50,
+        "effort": 1
+      },
+      "due": "",
+      "stakeholder": "Strategy",
+      "tags": [
+        "research"
+      ],
+      "dod": [],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-07-27T10:00:00.000Z",
+      "updatedAt": "2026-07-27T10:00:00.000Z",
+      "statusChangedAt": "2026-07-27T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    },
+    {
+      "id": "T-008",
+      "title": "Fix typo",
+      "why": "",
+      "objective": "",
+      "status": "backlog",
+      "important": false,
+      "urgent": false,
+      "rice": {
+        "reach": null,
+        "impact": null,
+        "confidence": null,
+        "effort": null
+      },
+      "due": "",
+      "stakeholder": "",
+      "tags": [],
+      "dod": [],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z",
+      "statusChangedAt": "2026-09-02T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    },
+    {
+      "id": "T-009",
+      "title": "Run usability test on new address-capture step",
+      "why": "Address step has 12% abandonment; hypothesis is that autocomplete fails for PO boxes.",
+      "objective": "Cut onboarding drop-off",
+      "status": "review",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 900,
+        "impact": 1,
+        "confidence": 80,
+        "effort": 1
+      },
+      "due": "2026-09-08",
+      "stakeholder": "UX research",
+      "tags": [
+        "onboarding",
+        "research"
+      ],
+      "dod": [
+        {
+          "text": "5 sessions completed",
+          "done": true
+        },
+        {
+          "text": "Findings shared with squad",
+          "done": true
+        },
+        {
+          "text": "Backlog items created",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-18T10:00:00.000Z",
+      "updatedAt": "2026-09-03T10:00:00.000Z",
+      "statusChangedAt": "2026-09-03T10:00:00.000Z",
+      "startedAt": "2026-08-25T10:00:00.000Z",
+      "doneAt": null
+    },
+    {
+      "id": "T-010",
+      "title": "Audit consent copy against updated data-protection guidance",
+      "why": "Legal flagged the consent wording; risk of remediation if not aligned before audit.",
+      "objective": "Reduce KYC cost per case",
+      "status": "backlog",
+      "important": true,
+      "urgent": true,
+      "rice": {
+        "reach": 5000,
+        "impact": 1,
+        "confidence": 80,
+        "effort": 1
+      },
+      "due": "2026-09-11",
+      "stakeholder": "Legal",
+      "tags": [
+        "compliance"
+      ],
+      "dod": [],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-09-01T10:00:00.000Z",
+      "updatedAt": "2026-09-01T10:00:00.000Z",
+      "statusChangedAt": "2026-09-01T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    },
+    {
+      "id": "T-011",
+      "title": "Launch in-app progress indicator for onboarding steps",
+      "why": "Users who see progress complete 8% more often in similar flows (internal A/B, Q2).",
+      "objective": "Cut onboarding drop-off",
+      "status": "done",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 2000,
+        "impact": 1,
+        "confidence": 100,
+        "effort": 1.5
+      },
+      "due": "2026-08-28",
+      "stakeholder": "Design",
+      "tags": [
+        "onboarding"
+      ],
+      "dod": [
+        {
+          "text": "A/B result reviewed",
+          "done": true
+        },
+        {
+          "text": "Rolled to 100%",
+          "done": true
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-07-31T10:00:00.000Z",
+      "updatedAt": "2026-08-27T10:00:00.000Z",
+      "statusChangedAt": "2026-08-27T10:00:00.000Z",
+      "startedAt": "2026-08-14T10:00:00.000Z",
+      "doneAt": "2026-08-27T10:00:00.000Z"
+    },
+    {
+      "id": "T-012",
+      "title": "Reduce OTP delivery failures with secondary SMS provider",
+      "why": "OTP failure was the #1 support driver in July.",
+      "objective": "Cut onboarding drop-off",
+      "status": "done",
+      "important": true,
+      "urgent": true,
+      "rice": {
+        "reach": 3000,
+        "impact": 2,
+        "confidence": 80,
+        "effort": 2
+      },
+      "due": "2026-08-21",
+      "stakeholder": "Eng lead",
+      "tags": [
+        "onboarding",
+        "platform"
+      ],
+      "dod": [
+        {
+          "text": "Failover tested",
+          "done": true
+        },
+        {
+          "text": "Support macro updated",
+          "done": true
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-07-22T10:00:00.000Z",
+      "updatedAt": "2026-08-20T10:00:00.000Z",
+      "statusChangedAt": "2026-08-20T10:00:00.000Z",
+      "startedAt": "2026-08-05T10:00:00.000Z",
+      "doneAt": "2026-08-20T10:00:00.000Z"
+    },
+    {
+      "id": "T-013",
+      "title": "Set up weekly onboarding funnel review with Data",
+      "why": "Funnel changes were noticed a month late in Q2.",
+      "objective": "Cut onboarding drop-off",
+      "status": "done",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 10,
+        "impact": 1,
+        "confidence": 100,
+        "effort": 0.25
+      },
+      "due": "2026-08-16",
+      "stakeholder": "Data",
+      "tags": [
+        "analytics"
+      ],
+      "dod": [
+        {
+          "text": "Recurring meeting and dashboard link",
+          "done": true
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-03T10:00:00.000Z",
+      "updatedAt": "2026-08-12T10:00:00.000Z",
+      "statusChangedAt": "2026-08-12T10:00:00.000Z",
+      "startedAt": "2026-08-09T10:00:00.000Z",
+      "doneAt": "2026-08-12T10:00:00.000Z"
+    },
+    {
+      "id": "T-014",
+      "title": "Migrate KYC decision logs to new audit store",
+      "why": "Audit asked for 7-year retention; current store purges at 2.",
+      "objective": "Reduce KYC cost per case",
+      "status": "done",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 5000,
+        "impact": 0.5,
+        "confidence": 80,
+        "effort": 3
+      },
+      "due": "2026-09-02",
+      "stakeholder": "Compliance · Platform",
+      "tags": [
+        "compliance",
+        "platform"
+      ],
+      "dod": [
+        {
+          "text": "Backfill verified by Audit",
+          "done": true
+        },
+        {
+          "text": "Old purge job disabled",
+          "done": false
+        }
+      ],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-07-17T10:00:00.000Z",
+      "updatedAt": "2026-09-01T10:00:00.000Z",
+      "statusChangedAt": "2026-09-01T10:00:00.000Z",
+      "startedAt": "2026-08-01T10:00:00.000Z",
+      "doneAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "T-015",
+      "title": "Close pricing question from partner bank on per-check fees",
+      "why": "",
+      "objective": "",
+      "status": "done",
+      "important": false,
+      "urgent": true,
+      "rice": {
+        "reach": 1,
+        "impact": 0.5,
+        "confidence": 100,
+        "effort": 0.25
+      },
+      "due": "2026-08-06",
+      "stakeholder": "Partnerships",
+      "tags": [
+        "request"
+      ],
+      "dod": [],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-02T10:00:00.000Z",
+      "updatedAt": "2026-08-05T10:00:00.000Z",
+      "statusChangedAt": "2026-08-05T10:00:00.000Z",
+      "startedAt": "2026-08-04T10:00:00.000Z",
+      "doneAt": "2026-08-05T10:00:00.000Z"
+    },
+    {
+      "id": "T-016",
+      "title": "Draft experiment plan: pre-filled company data from registry",
+      "why": "Hypothesis: pre-filling registry data cuts SME form time by 40%.",
+      "objective": "Ship SME onboarding v2",
+      "status": "backlog",
+      "important": true,
+      "urgent": false,
+      "rice": {
+        "reach": 600,
+        "impact": 2,
+        "confidence": 50,
+        "effort": 2
+      },
+      "due": "",
+      "stakeholder": "Eng lead",
+      "tags": [
+        "sme",
+        "experiment"
+      ],
+      "dod": [],
+      "notes": "",
+      "blockedReason": "",
+      "focus": false,
+      "sample": true,
+      "createdAt": "2026-08-30T10:00:00.000Z",
+      "updatedAt": "2026-08-30T10:00:00.000Z",
+      "statusChangedAt": "2026-08-30T10:00:00.000Z",
+      "startedAt": null,
+      "doneAt": null
+    }
+  ]
+}
