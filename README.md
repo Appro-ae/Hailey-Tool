@@ -70,6 +70,22 @@ Use *Settings & data → Export JSON backup* before clearing site data or changi
 - **Import JSON** replaces the board with a previous backup.
 - Example tasks (marked *Example*) load on first open so every view is legible. Remove them from Settings when you start real work.
 
+## Appro brand
+
+The interface follows the Appro branding guidelines: Lato only, the five brand colours only, rounded shapes only, and the four-circle brand mark.
+
+| Meaning in the tool | Light theme | Dark theme |
+|---|---|---|
+| Primary action, In progress, "Schedule" quadrant, healthy score | Blue `#3b7ef6` | Blue `#3b7ef6` |
+| Warning, due soon, Blocked series, Focus, "Delegate" quadrant, this week's bar | Yellow `#fdba23` with navy text | Yellow `#fdba23` |
+| Critical, overdue, "Do first" quadrant | Navy `#1a214d` fill with white text | White fill with navy text |
+| Page ground and containers | Lavender `#edf2ff` and white | `#0f1530` and `#111936` (the two permitted dark backgrounds) |
+| Third chart series (In review) | Blue ring instead of a third colour | Same |
+
+Because green and red are outside the palette, severity is carried by fill weight and shape (solid navy pill for critical, yellow pill for warning, blue dot for info) rather than by hue.
+
+**Logo.** The guideline forbids redrawing the Appro logo, and the logo files are not in this repository. The rail has a slot for it: set the CSS variable `--logo` to a `data:` URI of `logo-dark.svg` (and `logo-white.svg` under the dark-theme tokens), then add the `data-has-logo` attribute to the `.brand-logo` element in `pm-flightdeck/index.html`. Until then the four-circle brand mark, drawn to the guideline's geometry, carries the brand.
+
 ## Keyboard
 
 | Key | Action |
