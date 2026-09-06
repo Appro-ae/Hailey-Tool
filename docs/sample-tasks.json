@@ -1,9 +1,52 @@
 {
-  "note": "Example tasks used by PM Flightdeck. Dates are relative to the generation date.",
-  "generatedOn": "2026-09-05",
+  "note": "Example projects and tasks used by PM Flightdeck. Dates are relative to the generation date.",
+  "generatedOn": "2026-09-06",
+  "projects": [
+    {
+      "id": "P-01",
+      "code": "ONB",
+      "name": "Onboarding v2",
+      "description": "Rebuild the retail and SME onboarding journey to cut drop-off and time-to-first-transaction.",
+      "status": "active",
+      "sponsor": "CPO",
+      "objective": "Cut onboarding drop-off",
+      "due": "2026-11-05",
+      "sample": true,
+      "createdAt": "2026-07-18T10:00:00.000Z",
+      "updatedAt": "2026-09-05T10:00:00.000Z"
+    },
+    {
+      "id": "P-02",
+      "code": "KYC",
+      "name": "KYC vendor & compliance",
+      "description": "Renew or replace the KYC vendor, close audit findings, and bring cost per case down.",
+      "status": "active",
+      "sponsor": "Head of Compliance",
+      "objective": "Reduce KYC cost per case",
+      "due": "2026-10-01",
+      "sample": true,
+      "createdAt": "2026-07-23T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "P-03",
+      "code": "BILL",
+      "name": "Billing platform migration",
+      "description": "Move invoicing and partner fee billing to the new platform. Paused until Finance signs the scope.",
+      "status": "hold",
+      "sponsor": "CFO",
+      "objective": "",
+      "due": "",
+      "sample": true,
+      "createdAt": "2026-06-28T10:00:00.000Z",
+      "updatedAt": "2026-08-17T10:00:00.000Z"
+    }
+  ],
   "tasks": [
     {
       "id": "T-001",
+      "projectId": "P-01",
+      "category": "Delivery",
       "title": "Ship eKYC retry flow for failed liveness checks",
       "why": "Liveness failures are 31% of onboarding drop-off; a retry with guidance recovers a share of them.",
       "objective": "Cut onboarding drop-off",
@@ -16,7 +59,7 @@
         "confidence": 80,
         "effort": 3
       },
-      "due": "2026-09-07",
+      "due": "2026-09-08",
       "stakeholder": "Eng lead · Compliance",
       "tags": [
         "onboarding",
@@ -40,14 +83,16 @@
       "blockedReason": "",
       "focus": true,
       "sample": true,
-      "createdAt": "2026-08-12T10:00:00.000Z",
-      "updatedAt": "2026-09-04T10:00:00.000Z",
-      "statusChangedAt": "2026-08-30T10:00:00.000Z",
-      "startedAt": "2026-08-30T10:00:00.000Z",
+      "createdAt": "2026-08-13T10:00:00.000Z",
+      "updatedAt": "2026-09-05T10:00:00.000Z",
+      "statusChangedAt": "2026-08-31T10:00:00.000Z",
+      "startedAt": "2026-08-31T10:00:00.000Z",
       "doneAt": null
     },
     {
       "id": "T-002",
+      "projectId": "P-01",
+      "category": "Product discovery",
       "title": "Define success metrics for SME onboarding funnel",
       "why": "Without a baseline the v2 launch cannot be judged. Needed before design starts.",
       "objective": "Ship SME onboarding v2",
@@ -60,7 +105,7 @@
         "confidence": 80,
         "effort": 1
       },
-      "due": "2026-09-10",
+      "due": "2026-09-11",
       "stakeholder": "Head of Product · Data",
       "tags": [
         "sme",
@@ -80,14 +125,16 @@
       "blockedReason": "",
       "focus": true,
       "sample": true,
-      "createdAt": "2026-08-21T10:00:00.000Z",
-      "updatedAt": "2026-08-28T10:00:00.000Z",
-      "statusChangedAt": "2026-08-27T10:00:00.000Z",
-      "startedAt": "2026-08-27T10:00:00.000Z",
+      "createdAt": "2026-08-22T10:00:00.000Z",
+      "updatedAt": "2026-08-29T10:00:00.000Z",
+      "statusChangedAt": "2026-08-28T10:00:00.000Z",
+      "startedAt": "2026-08-28T10:00:00.000Z",
       "doneAt": null
     },
     {
       "id": "T-003",
+      "projectId": "P-02",
+      "category": "Management",
       "title": "Review SLA with KYC vendor before renewal",
       "why": "Contract renews in 3 weeks; P95 verification time has doubled since Q1.",
       "objective": "Reduce KYC cost per case",
@@ -100,7 +147,7 @@
         "confidence": 100,
         "effort": 1
       },
-      "due": "2026-09-03",
+      "due": "2026-09-04",
       "stakeholder": "Procurement · Vendor AM",
       "tags": [
         "kyc",
@@ -120,14 +167,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-06T10:00:00.000Z",
-      "updatedAt": "2026-08-31T10:00:00.000Z",
-      "statusChangedAt": "2026-08-31T10:00:00.000Z",
-      "startedAt": "2026-08-24T10:00:00.000Z",
+      "createdAt": "2026-08-07T10:00:00.000Z",
+      "updatedAt": "2026-09-01T10:00:00.000Z",
+      "statusChangedAt": "2026-09-01T10:00:00.000Z",
+      "startedAt": "2026-08-25T10:00:00.000Z",
       "doneAt": null
     },
     {
       "id": "T-004",
+      "projectId": "P-01",
+      "category": "Delivery",
       "title": "Write PRD for document upload fallback (manual review)",
       "why": "Customers with unsupported ID types have no path today; support tickets rising.",
       "objective": "Cut onboarding drop-off",
@@ -140,7 +189,7 @@
         "confidence": 80,
         "effort": 2
       },
-      "due": "2026-09-14",
+      "due": "2026-09-15",
       "stakeholder": "Ops lead",
       "tags": [
         "onboarding"
@@ -155,14 +204,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-26T10:00:00.000Z",
-      "updatedAt": "2026-09-02T10:00:00.000Z",
-      "statusChangedAt": "2026-09-02T10:00:00.000Z",
+      "createdAt": "2026-08-27T10:00:00.000Z",
+      "updatedAt": "2026-09-03T10:00:00.000Z",
+      "statusChangedAt": "2026-09-03T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     },
     {
       "id": "T-005",
+      "projectId": "P-01",
+      "category": "Management",
       "title": "Prepare Q4 roadmap narrative for exec review",
       "why": "Exec review on the 18th decides headcount for onboarding squad.",
       "objective": "Ship SME onboarding v2",
@@ -175,7 +226,7 @@
         "confidence": 50,
         "effort": 1.5
       },
-      "due": "2026-09-17",
+      "due": "2026-09-18",
       "stakeholder": "CPO",
       "tags": [
         "roadmap"
@@ -194,14 +245,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-29T10:00:00.000Z",
-      "updatedAt": "2026-08-29T10:00:00.000Z",
-      "statusChangedAt": "2026-08-29T10:00:00.000Z",
+      "createdAt": "2026-08-30T10:00:00.000Z",
+      "updatedAt": "2026-08-30T10:00:00.000Z",
+      "statusChangedAt": "2026-08-30T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     },
     {
       "id": "T-006",
+      "projectId": "P-01",
+      "category": "Stakeholder",
       "title": "Answer sales request for custom onboarding demo",
       "why": "",
       "objective": "",
@@ -214,7 +267,7 @@
         "confidence": 80,
         "effort": 0.5
       },
-      "due": "2026-09-06",
+      "due": "2026-09-07",
       "stakeholder": "Sales director",
       "tags": [
         "request"
@@ -224,14 +277,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-09-03T10:00:00.000Z",
-      "updatedAt": "2026-09-03T10:00:00.000Z",
-      "statusChangedAt": "2026-09-03T10:00:00.000Z",
+      "createdAt": "2026-09-04T10:00:00.000Z",
+      "updatedAt": "2026-09-04T10:00:00.000Z",
+      "statusChangedAt": "2026-09-04T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     },
     {
       "id": "T-007",
+      "projectId": "P-01",
+      "category": "Product discovery",
       "title": "Benchmark competitor onboarding time-to-first-transaction",
       "why": "Board asked how we compare; informs the v2 target.",
       "objective": "Ship SME onboarding v2",
@@ -254,14 +309,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-07-27T10:00:00.000Z",
-      "updatedAt": "2026-07-27T10:00:00.000Z",
-      "statusChangedAt": "2026-07-27T10:00:00.000Z",
+      "createdAt": "2026-07-28T10:00:00.000Z",
+      "updatedAt": "2026-07-28T10:00:00.000Z",
+      "statusChangedAt": "2026-07-28T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     },
     {
       "id": "T-008",
+      "projectId": "",
+      "category": "",
       "title": "Fix typo",
       "why": "",
       "objective": "",
@@ -282,14 +339,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-09-02T10:00:00.000Z",
-      "updatedAt": "2026-09-02T10:00:00.000Z",
-      "statusChangedAt": "2026-09-02T10:00:00.000Z",
+      "createdAt": "2026-09-03T10:00:00.000Z",
+      "updatedAt": "2026-09-03T10:00:00.000Z",
+      "statusChangedAt": "2026-09-03T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     },
     {
       "id": "T-009",
+      "projectId": "P-01",
+      "category": "Product discovery",
       "title": "Run usability test on new address-capture step",
       "why": "Address step has 12% abandonment; hypothesis is that autocomplete fails for PO boxes.",
       "objective": "Cut onboarding drop-off",
@@ -302,7 +361,7 @@
         "confidence": 80,
         "effort": 1
       },
-      "due": "2026-09-08",
+      "due": "2026-09-09",
       "stakeholder": "UX research",
       "tags": [
         "onboarding",
@@ -326,14 +385,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-18T10:00:00.000Z",
-      "updatedAt": "2026-09-03T10:00:00.000Z",
-      "statusChangedAt": "2026-09-03T10:00:00.000Z",
-      "startedAt": "2026-08-25T10:00:00.000Z",
+      "createdAt": "2026-08-19T10:00:00.000Z",
+      "updatedAt": "2026-09-04T10:00:00.000Z",
+      "statusChangedAt": "2026-09-04T10:00:00.000Z",
+      "startedAt": "2026-08-26T10:00:00.000Z",
       "doneAt": null
     },
     {
       "id": "T-010",
+      "projectId": "P-02",
+      "category": "Compliance",
       "title": "Audit consent copy against updated data-protection guidance",
       "why": "Legal flagged the consent wording; risk of remediation if not aligned before audit.",
       "objective": "Reduce KYC cost per case",
@@ -346,7 +407,7 @@
         "confidence": 80,
         "effort": 1
       },
-      "due": "2026-09-11",
+      "due": "2026-09-12",
       "stakeholder": "Legal",
       "tags": [
         "compliance"
@@ -356,14 +417,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-09-01T10:00:00.000Z",
-      "updatedAt": "2026-09-01T10:00:00.000Z",
-      "statusChangedAt": "2026-09-01T10:00:00.000Z",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z",
+      "statusChangedAt": "2026-09-02T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     },
     {
       "id": "T-011",
+      "projectId": "P-01",
+      "category": "Delivery",
       "title": "Launch in-app progress indicator for onboarding steps",
       "why": "Users who see progress complete 8% more often in similar flows (internal A/B, Q2).",
       "objective": "Cut onboarding drop-off",
@@ -376,7 +439,7 @@
         "confidence": 100,
         "effort": 1.5
       },
-      "due": "2026-08-28",
+      "due": "2026-08-29",
       "stakeholder": "Design",
       "tags": [
         "onboarding"
@@ -395,14 +458,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-07-31T10:00:00.000Z",
-      "updatedAt": "2026-08-27T10:00:00.000Z",
-      "statusChangedAt": "2026-08-27T10:00:00.000Z",
-      "startedAt": "2026-08-14T10:00:00.000Z",
-      "doneAt": "2026-08-27T10:00:00.000Z"
+      "createdAt": "2026-08-01T10:00:00.000Z",
+      "updatedAt": "2026-08-28T10:00:00.000Z",
+      "statusChangedAt": "2026-08-28T10:00:00.000Z",
+      "startedAt": "2026-08-15T10:00:00.000Z",
+      "doneAt": "2026-08-28T10:00:00.000Z"
     },
     {
       "id": "T-012",
+      "projectId": "P-01",
+      "category": "Delivery",
       "title": "Reduce OTP delivery failures with secondary SMS provider",
       "why": "OTP failure was the #1 support driver in July.",
       "objective": "Cut onboarding drop-off",
@@ -415,7 +480,7 @@
         "confidence": 80,
         "effort": 2
       },
-      "due": "2026-08-21",
+      "due": "2026-08-22",
       "stakeholder": "Eng lead",
       "tags": [
         "onboarding",
@@ -435,14 +500,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-07-22T10:00:00.000Z",
-      "updatedAt": "2026-08-20T10:00:00.000Z",
-      "statusChangedAt": "2026-08-20T10:00:00.000Z",
-      "startedAt": "2026-08-05T10:00:00.000Z",
-      "doneAt": "2026-08-20T10:00:00.000Z"
+      "createdAt": "2026-07-23T10:00:00.000Z",
+      "updatedAt": "2026-08-21T10:00:00.000Z",
+      "statusChangedAt": "2026-08-21T10:00:00.000Z",
+      "startedAt": "2026-08-06T10:00:00.000Z",
+      "doneAt": "2026-08-21T10:00:00.000Z"
     },
     {
       "id": "T-013",
+      "projectId": "P-01",
+      "category": "Management",
       "title": "Set up weekly onboarding funnel review with Data",
       "why": "Funnel changes were noticed a month late in Q2.",
       "objective": "Cut onboarding drop-off",
@@ -455,7 +522,7 @@
         "confidence": 100,
         "effort": 0.25
       },
-      "due": "2026-08-16",
+      "due": "2026-08-17",
       "stakeholder": "Data",
       "tags": [
         "analytics"
@@ -470,14 +537,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-03T10:00:00.000Z",
-      "updatedAt": "2026-08-12T10:00:00.000Z",
-      "statusChangedAt": "2026-08-12T10:00:00.000Z",
-      "startedAt": "2026-08-09T10:00:00.000Z",
-      "doneAt": "2026-08-12T10:00:00.000Z"
+      "createdAt": "2026-08-04T10:00:00.000Z",
+      "updatedAt": "2026-08-13T10:00:00.000Z",
+      "statusChangedAt": "2026-08-13T10:00:00.000Z",
+      "startedAt": "2026-08-10T10:00:00.000Z",
+      "doneAt": "2026-08-13T10:00:00.000Z"
     },
     {
       "id": "T-014",
+      "projectId": "P-02",
+      "category": "Compliance",
       "title": "Migrate KYC decision logs to new audit store",
       "why": "Audit asked for 7-year retention; current store purges at 2.",
       "objective": "Reduce KYC cost per case",
@@ -490,7 +559,7 @@
         "confidence": 80,
         "effort": 3
       },
-      "due": "2026-09-02",
+      "due": "2026-09-03",
       "stakeholder": "Compliance · Platform",
       "tags": [
         "compliance",
@@ -510,14 +579,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-07-17T10:00:00.000Z",
-      "updatedAt": "2026-09-01T10:00:00.000Z",
-      "statusChangedAt": "2026-09-01T10:00:00.000Z",
-      "startedAt": "2026-08-01T10:00:00.000Z",
-      "doneAt": "2026-09-01T10:00:00.000Z"
+      "createdAt": "2026-07-18T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z",
+      "statusChangedAt": "2026-09-02T10:00:00.000Z",
+      "startedAt": "2026-08-02T10:00:00.000Z",
+      "doneAt": "2026-09-02T10:00:00.000Z"
     },
     {
       "id": "T-015",
+      "projectId": "P-03",
+      "category": "Billing",
       "title": "Close pricing question from partner bank on per-check fees",
       "why": "",
       "objective": "",
@@ -530,7 +601,7 @@
         "confidence": 100,
         "effort": 0.25
       },
-      "due": "2026-08-06",
+      "due": "2026-08-07",
       "stakeholder": "Partnerships",
       "tags": [
         "request"
@@ -540,14 +611,16 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-02T10:00:00.000Z",
-      "updatedAt": "2026-08-05T10:00:00.000Z",
-      "statusChangedAt": "2026-08-05T10:00:00.000Z",
-      "startedAt": "2026-08-04T10:00:00.000Z",
-      "doneAt": "2026-08-05T10:00:00.000Z"
+      "createdAt": "2026-08-03T10:00:00.000Z",
+      "updatedAt": "2026-08-06T10:00:00.000Z",
+      "statusChangedAt": "2026-08-06T10:00:00.000Z",
+      "startedAt": "2026-08-05T10:00:00.000Z",
+      "doneAt": "2026-08-06T10:00:00.000Z"
     },
     {
       "id": "T-016",
+      "projectId": "P-01",
+      "category": "Product discovery",
       "title": "Draft experiment plan: pre-filled company data from registry",
       "why": "Hypothesis: pre-filling registry data cuts SME form time by 40%.",
       "objective": "Ship SME onboarding v2",
@@ -571,9 +644,9 @@
       "blockedReason": "",
       "focus": false,
       "sample": true,
-      "createdAt": "2026-08-30T10:00:00.000Z",
-      "updatedAt": "2026-08-30T10:00:00.000Z",
-      "statusChangedAt": "2026-08-30T10:00:00.000Z",
+      "createdAt": "2026-08-31T10:00:00.000Z",
+      "updatedAt": "2026-08-31T10:00:00.000Z",
+      "statusChangedAt": "2026-08-31T10:00:00.000Z",
       "startedAt": null,
       "doneAt": null
     }

@@ -193,6 +193,32 @@
   .chip.tag { background: var(--surface-2); color: var(--ink-2); font-weight: 600; }
   .chip.focus { background: var(--amber-soft); color: var(--amber); }
   .chip.sample { background: transparent; border: 1px dashed var(--line-2); color: var(--muted); font-weight: 600; }
+  .chip.proj { background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-weight: 600; }
+  .chip.cat { background: transparent; border: 1px solid var(--line-2); color: var(--ink-2); font-weight: 600; }
+  .chip.pstat { background: var(--surface-2); color: var(--ink-2); }
+  .chip.pstat.active { background: var(--good-soft); color: var(--good); }
+  .chip.pstat.hold { background: var(--warn-soft); color: var(--warn); }
+  .chip.pstat.done { background: var(--surface-2); color: var(--muted); }
+  .scope { display: flex; align-items: center; gap: 8px; }
+  .scope select { width: auto; max-width: 260px; font-weight: 600; padding: 6px 28px 6px 10px; }
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .pcard.hold { opacity: 0.85; }
+  .pcard.done { opacity: 0.7; }
+  .pcard .ph { display: flex; align-items: flex-start; gap: 8px; }
+  .pcard .ph h3 { font-size: 15px; flex: 1; }
+  .pcard .pdesc { font-size: 12.5px; color: var(--ink-2); }
+  .pcard .pstats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .pcard .pstat-cell { display: flex; flex-direction: column; }
+  .pcard .pstat-cell .n { font-family: var(--font-mono); font-size: 16px; font-weight: 600; }
+  .pcard .pstat-cell .n.crit { color: var(--crit); }
+  .pcard .pstat-cell .n.warn { color: var(--warn); }
+  .pcard .pstat-cell .l { font-size: 11px; color: var(--muted); }
+  .bar-track { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+  .pcard .pfoot { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+  .cat-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 16px; border-top: 1px solid var(--line); font-size: 13px; }
+  .cat-row:first-child { border-top: 0; }
   .sev { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
   .sev.critical { background: var(--crit); }
   .sev.warning { background: var(--warn); }
@@ -220,13 +246,13 @@
 
   /* task list rows */
   .tlist { display: flex; flex-direction: column; }
-  .trow { display: grid; grid-template-columns: 62px 1fr auto; gap: 12px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--line); cursor: pointer; }
+  .trow { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--line); cursor: pointer; }
   .trow:first-child { border-top: 0; }
   .trow:hover { background: var(--surface-2); }
   .trow .tid { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
   .trow .ttl { font-weight: 600; }
   .trow .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
-  .trow .meta { display: flex; gap: 6px; align-items: center; }
+  .trow .meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 300px; }
 
   /* ---------- board ---------- */
   .board { display: grid; grid-template-columns: repeat(6, minmax(168px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; }
@@ -391,6 +417,7 @@
         <h1 id="view-title">Today</h1>
         <div class="date" id="today-label"></div>
       </div>
+      <div class="scope"><label class="eyebrow" for="project-scope">Project</label><select id="project-scope" aria-label="Project scope"></select></div>
       <form class="capture" id="capture-form" autocomplete="off">
         <input type="text" id="capture-input" placeholder="Capture a task — start with a verb, e.g. “Draft KYC vendor SLA review”" aria-label="Capture a task">
         <button class="btn primary" type="submit">Add to backlog</button>
@@ -428,7 +455,9 @@
     { v: 0.5, label: '0.5 · Low' }, { v: 0.25, label: '0.25 · Minimal' }
   ];
   const CONF = [{ v: 100, label: '100% · Data' }, { v: 80, label: '80% · Some data' }, { v: 50, label: '50% · Gut feel' }];
+  const PSTATUS = [{ id: 'active', label: 'Active' }, { id: 'hold', label: 'On hold' }, { id: 'done', label: 'Completed' }];
   const VIEWS = [
+    { id: 'projects', label: 'Projects' },
     { id: 'today', label: 'Today' },
     { id: 'board', label: 'Board' },
     { id: 'prioritise', label: 'Prioritise' },
@@ -443,12 +472,15 @@
     backlogAgeDays: 30,
     seq: 1,
     objectives: ['Cut onboarding drop-off', 'Ship SME onboarding v2', 'Reduce KYC cost per case'],
+    categories: ['Management', 'Billing', 'Product discovery', 'Delivery', 'Compliance', 'Stakeholder'],
+    pseq: 1,
     review: { week: '', checks: {}, focus: '' },
     reviews: [],
     prioTab: 'rice',
     sampleLoaded: false
   };
   const LS_KEY = 'pm-flightdeck-v1';
+  const LS_SCOPE = 'pm-flightdeck-scope';
 
   /* ================= utils ================= */
   const $ = (s, el) => (el || document).querySelector(s);
@@ -487,16 +519,38 @@
     mode: 'local',
     db: null,
     tasks: {},
+    projects: {},
     settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
     ready: false,
     list() { return Object.values(this.tasks); },
     get(id) { return this.tasks[id]; },
+    projectList() { return Object.values(this.projects).sort((a, b) => (a.status === 'done') - (b.status === 'done') || a.name.localeCompare(b.name)); },
+    project(id) { return this.projects[id]; },
+    newProjectId() {
+      const n = this.settings.pseq || 1;
+      this.settings.pseq = n + 1;
+      this.saveSettings();
+      return 'P-' + String(n).padStart(2, '0');
+    },
+    saveProject(pr) {
+      pr.updatedAt = iso(now());
+      this.projects[pr.id] = pr;
+      if (this.mode === 'db') { this.db.doc('projects/' + pr.id).set(pr).catch((e) => toast('Could not save project: ' + (e && e.message ? e.message : 'unknown error'))); } else { this.persistLocal(); }
+      render();
+    },
+    deleteProject(id) {
+      delete this.projects[id];
+      if (this.mode === 'db') { this.db.doc('projects/' + id).delete().catch(() => {}); } else { this.persistLocal(); }
+      if (scope === id) setScope('all');
+      render();
+    },
     loadLocal() {
       try {
         const raw = localStorage.getItem(LS_KEY);
         if (raw) {
           const data = JSON.parse(raw);
           this.tasks = data.tasks || {};
+          this.projects = data.projects || {};
           this.settings = Object.assign(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), data.settings || {});
           return true;
         }
@@ -504,7 +558,7 @@
       return false;
     },
     persistLocal() {
-      try { localStorage.setItem(LS_KEY, JSON.stringify({ tasks: this.tasks, settings: this.settings })); } catch (e) { /* ignore */ }
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ tasks: this.tasks, projects: this.projects, settings: this.settings })); } catch (e) { /* ignore */ }
     },
     newId() {
       const n = this.settings.seq || 1;
@@ -528,16 +582,23 @@
     saveSettings() {
       if (this.mode === 'db') { this.db.doc('meta/settings').set(this.settings).catch(() => {}); } else { this.persistLocal(); }
     },
-    replaceAll(tasks, settings) {
+    replaceAll(tasks, settings, projects) {
       const old = Object.keys(this.tasks);
+      const oldP = Object.keys(this.projects);
       this.tasks = {};
       tasks.forEach((t) => { this.tasks[t.id] = t; });
+      if (projects) { this.projects = {}; projects.forEach((pr) => { this.projects[pr.id] = pr; }); }
       if (settings) this.settings = Object.assign(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), settings);
       if (this.mode === 'db') {
         old.filter((id) => !this.tasks[id]).forEach((id) => this.db.doc('tasks/' + id).delete().catch(() => {}));
         tasks.forEach((t) => this.db.doc('tasks/' + t.id).set(t).catch(() => {}));
+        if (projects) {
+          oldP.filter((id) => !this.projects[id]).forEach((id) => this.db.doc('projects/' + id).delete().catch(() => {}));
+          projects.forEach((pr) => this.db.doc('projects/' + pr.id).set(pr).catch(() => {}));
+        }
         this.db.doc('meta/settings').set(this.settings).catch(() => {});
       } else { this.persistLocal(); }
+      if (scope !== 'all' && !this.projects[scope]) setScope('all');
       render();
     },
     async connectDb() {
@@ -553,6 +614,13 @@
         db.doc('meta/settings').onSnapshot((snap) => {
           if (snap.exists) this.settings = Object.assign(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), snap.data());
           settingsSeen = true;
+          render();
+        }, () => {});
+        db.collection('projects').onSnapshot((snap) => {
+          const next = {};
+          snap.docs.forEach((d) => { const pr = d.data(); if (pr && pr.id) next[pr.id] = pr; });
+          this.projects = next;
+          if (scope !== 'all' && !snap.metadata.fromCache && !next[scope]) setScope('all');
           render();
         }, () => {});
         db.collection('tasks').onSnapshot((snap) => {
@@ -571,33 +639,43 @@
 
   /* ================= sample data ================= */
   /*SAMPLE-START*/
+  function sampleProjects(base) {
+    const b = base ? new Date(base) : new Date();
+    const d = (offset) => { const x = new Date(b); x.setDate(x.getDate() + offset); x.setHours(10, 0, 0, 0); return x.toISOString(); };
+    const dd = (offset) => d(offset).slice(0, 10);
+    return [
+      { id: 'P-01', code: 'ONB', name: 'Onboarding v2', description: 'Rebuild the retail and SME onboarding journey to cut drop-off and time-to-first-transaction.', status: 'active', sponsor: 'CPO', objective: 'Cut onboarding drop-off', due: dd(60), sample: true, createdAt: d(-50), updatedAt: d(-1) },
+      { id: 'P-02', code: 'KYC', name: 'KYC vendor & compliance', description: 'Renew or replace the KYC vendor, close audit findings, and bring cost per case down.', status: 'active', sponsor: 'Head of Compliance', objective: 'Reduce KYC cost per case', due: dd(25), sample: true, createdAt: d(-45), updatedAt: d(-4) },
+      { id: 'P-03', code: 'BILL', name: 'Billing platform migration', description: 'Move invoicing and partner fee billing to the new platform. Paused until Finance signs the scope.', status: 'hold', sponsor: 'CFO', objective: '', due: '', sample: true, createdAt: d(-70), updatedAt: d(-20) }
+    ];
+  }
   function sampleTasks(base) {
     const b = base ? new Date(base) : new Date();
     const d = (offset) => { const x = new Date(b); x.setDate(x.getDate() + offset); x.setHours(10, 0, 0, 0); return x.toISOString(); };
     const dd = (offset) => d(offset).slice(0, 10);
     const T = (id, o) => Object.assign({
-      id, title: '', why: '', objective: '', status: 'backlog', important: false, urgent: false,
+      id, projectId: '', category: '', title: '', why: '', objective: '', status: 'backlog', important: false, urgent: false,
       rice: { reach: null, impact: null, confidence: null, effort: null }, due: '', stakeholder: '', tags: [],
       dod: [], notes: '', blockedReason: '', focus: false, sample: true,
       createdAt: d(-20), updatedAt: d(-1), statusChangedAt: d(-1), startedAt: null, doneAt: null
     }, o);
     return [
-      T('T-001', { title: 'Ship eKYC retry flow for failed liveness checks', why: 'Liveness failures are 31% of onboarding drop-off; a retry with guidance recovers a share of them.', objective: 'Cut onboarding drop-off', status: 'doing', important: true, urgent: true, rice: { reach: 1800, impact: 2, confidence: 80, effort: 3 }, due: dd(2), stakeholder: 'Eng lead · Compliance', tags: ['onboarding', 'kyc'], dod: [{ text: 'Retry UX approved by Compliance', done: true }, { text: 'Funnel event instrumented', done: false }, { text: 'Release note published', done: false }], createdAt: d(-24), statusChangedAt: d(-6), startedAt: d(-6), updatedAt: d(-1), focus: true }),
-      T('T-002', { title: 'Define success metrics for SME onboarding funnel', why: 'Without a baseline the v2 launch cannot be judged. Needed before design starts.', objective: 'Ship SME onboarding v2', status: 'doing', important: true, urgent: false, rice: { reach: 600, impact: 3, confidence: 80, effort: 1 }, due: dd(5), stakeholder: 'Head of Product · Data', tags: ['sme', 'analytics'], dod: [{ text: 'North-star and 3 guardrail metrics agreed', done: false }, { text: 'Dashboard spec handed to Data', done: false }], createdAt: d(-15), statusChangedAt: d(-9), startedAt: d(-9), updatedAt: d(-8), focus: true }),
-      T('T-003', { title: 'Review SLA with KYC vendor before renewal', why: 'Contract renews in 3 weeks; P95 verification time has doubled since Q1.', objective: 'Reduce KYC cost per case', status: 'blocked', important: true, urgent: true, rice: { reach: 5000, impact: 2, confidence: 100, effort: 1 }, due: dd(-2), stakeholder: 'Procurement · Vendor AM', tags: ['kyc', 'vendor'], dod: [{ text: 'Vendor P95 report received', done: false }, { text: 'Renewal recommendation sent to CFO', done: false }], blockedReason: '', createdAt: d(-30), statusChangedAt: d(-5), startedAt: d(-12), updatedAt: d(-5) }),
-      T('T-004', { title: 'Write PRD for document upload fallback (manual review)', why: 'Customers with unsupported ID types have no path today; support tickets rising.', objective: 'Cut onboarding drop-off', status: 'next', important: true, urgent: false, rice: { reach: 400, impact: 1, confidence: 80, effort: 2 }, due: dd(9), stakeholder: 'Ops lead', tags: ['onboarding'], dod: [{ text: 'PRD reviewed by Eng and Ops', done: false }], createdAt: d(-10), statusChangedAt: d(-3), updatedAt: d(-3) }),
-      T('T-005', { title: 'Prepare Q4 roadmap narrative for exec review', why: 'Exec review on the 18th decides headcount for onboarding squad.', objective: 'Ship SME onboarding v2', status: 'next', important: true, urgent: false, rice: { reach: 20, impact: 3, confidence: 50, effort: 1.5 }, due: dd(12), stakeholder: 'CPO', tags: ['roadmap'], dod: [{ text: 'One-page narrative', done: false }, { text: 'Options with cost/impact', done: false }], createdAt: d(-7), statusChangedAt: d(-7), updatedAt: d(-7) }),
-      T('T-006', { title: 'Answer sales request for custom onboarding demo', why: '', status: 'next', important: false, urgent: true, rice: { reach: 5, impact: 0.5, confidence: 80, effort: 0.5 }, due: dd(1), stakeholder: 'Sales director', tags: ['request'], createdAt: d(-2), statusChangedAt: d(-2), updatedAt: d(-2) }),
-      T('T-007', { title: 'Benchmark competitor onboarding time-to-first-transaction', why: 'Board asked how we compare; informs the v2 target.', objective: 'Ship SME onboarding v2', status: 'backlog', important: true, urgent: false, rice: { reach: 50, impact: 1, confidence: 50, effort: 1 }, due: '', stakeholder: 'Strategy', tags: ['research'], createdAt: d(-40), statusChangedAt: d(-40), updatedAt: d(-40) }),
-      T('T-008', { title: 'Fix typo', why: '', status: 'backlog', important: false, urgent: false, rice: { reach: null, impact: null, confidence: null, effort: null }, tags: [], createdAt: d(-3), statusChangedAt: d(-3), updatedAt: d(-3) }),
-      T('T-009', { title: 'Run usability test on new address-capture step', why: 'Address step has 12% abandonment; hypothesis is that autocomplete fails for PO boxes.', objective: 'Cut onboarding drop-off', status: 'review', important: true, urgent: false, rice: { reach: 900, impact: 1, confidence: 80, effort: 1 }, due: dd(3), stakeholder: 'UX research', tags: ['onboarding', 'research'], dod: [{ text: '5 sessions completed', done: true }, { text: 'Findings shared with squad', done: true }, { text: 'Backlog items created', done: false }], createdAt: d(-18), statusChangedAt: d(-2), startedAt: d(-11), updatedAt: d(-2) }),
-      T('T-010', { title: 'Audit consent copy against updated data-protection guidance', why: 'Legal flagged the consent wording; risk of remediation if not aligned before audit.', objective: 'Reduce KYC cost per case', status: 'backlog', important: true, urgent: true, rice: { reach: 5000, impact: 1, confidence: 80, effort: 1 }, due: dd(6), stakeholder: 'Legal', tags: ['compliance'], createdAt: d(-4), statusChangedAt: d(-4), updatedAt: d(-4) }),
-      T('T-011', { title: 'Launch in-app progress indicator for onboarding steps', why: 'Users who see progress complete 8% more often in similar flows (internal A/B, Q2).', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: false, rice: { reach: 2000, impact: 1, confidence: 100, effort: 1.5 }, due: dd(-8), stakeholder: 'Design', tags: ['onboarding'], dod: [{ text: 'A/B result reviewed', done: true }, { text: 'Rolled to 100%', done: true }], createdAt: d(-36), statusChangedAt: d(-9), startedAt: d(-22), doneAt: d(-9), updatedAt: d(-9) }),
-      T('T-012', { title: 'Reduce OTP delivery failures with secondary SMS provider', why: 'OTP failure was the #1 support driver in July.', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: true, rice: { reach: 3000, impact: 2, confidence: 80, effort: 2 }, due: dd(-15), stakeholder: 'Eng lead', tags: ['onboarding', 'platform'], dod: [{ text: 'Failover tested', done: true }, { text: 'Support macro updated', done: true }], createdAt: d(-45), statusChangedAt: d(-16), startedAt: d(-31), doneAt: d(-16), updatedAt: d(-16) }),
-      T('T-013', { title: 'Set up weekly onboarding funnel review with Data', why: 'Funnel changes were noticed a month late in Q2.', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: false, rice: { reach: 10, impact: 1, confidence: 100, effort: 0.25 }, due: dd(-20), stakeholder: 'Data', tags: ['analytics'], dod: [{ text: 'Recurring meeting and dashboard link', done: true }], createdAt: d(-33), statusChangedAt: d(-24), startedAt: d(-27), doneAt: d(-24), updatedAt: d(-24) }),
-      T('T-014', { title: 'Migrate KYC decision logs to new audit store', why: 'Audit asked for 7-year retention; current store purges at 2.', objective: 'Reduce KYC cost per case', status: 'done', important: true, urgent: false, rice: { reach: 5000, impact: 0.5, confidence: 80, effort: 3 }, due: dd(-3), stakeholder: 'Compliance · Platform', tags: ['compliance', 'platform'], dod: [{ text: 'Backfill verified by Audit', done: true }, { text: 'Old purge job disabled', done: false }], createdAt: d(-50), statusChangedAt: d(-4), startedAt: d(-35), doneAt: d(-4), updatedAt: d(-4) }),
-      T('T-015', { title: 'Close pricing question from partner bank on per-check fees', why: '', status: 'done', important: false, urgent: true, rice: { reach: 1, impact: 0.5, confidence: 100, effort: 0.25 }, due: dd(-30), stakeholder: 'Partnerships', tags: ['request'], createdAt: d(-34), statusChangedAt: d(-31), startedAt: d(-32), doneAt: d(-31), updatedAt: d(-31) }),
-      T('T-016', { title: 'Draft experiment plan: pre-filled company data from registry', why: 'Hypothesis: pre-filling registry data cuts SME form time by 40%.', objective: 'Ship SME onboarding v2', status: 'backlog', important: true, urgent: false, rice: { reach: 600, impact: 2, confidence: 50, effort: 2 }, due: '', stakeholder: 'Eng lead', tags: ['sme', 'experiment'], createdAt: d(-6), statusChangedAt: d(-6), updatedAt: d(-6) })
+      T('T-001', { projectId: 'P-01', category: 'Delivery', title: 'Ship eKYC retry flow for failed liveness checks', why: 'Liveness failures are 31% of onboarding drop-off; a retry with guidance recovers a share of them.', objective: 'Cut onboarding drop-off', status: 'doing', important: true, urgent: true, rice: { reach: 1800, impact: 2, confidence: 80, effort: 3 }, due: dd(2), stakeholder: 'Eng lead · Compliance', tags: ['onboarding', 'kyc'], dod: [{ text: 'Retry UX approved by Compliance', done: true }, { text: 'Funnel event instrumented', done: false }, { text: 'Release note published', done: false }], createdAt: d(-24), statusChangedAt: d(-6), startedAt: d(-6), updatedAt: d(-1), focus: true }),
+      T('T-002', { projectId: 'P-01', category: 'Product discovery', title: 'Define success metrics for SME onboarding funnel', why: 'Without a baseline the v2 launch cannot be judged. Needed before design starts.', objective: 'Ship SME onboarding v2', status: 'doing', important: true, urgent: false, rice: { reach: 600, impact: 3, confidence: 80, effort: 1 }, due: dd(5), stakeholder: 'Head of Product · Data', tags: ['sme', 'analytics'], dod: [{ text: 'North-star and 3 guardrail metrics agreed', done: false }, { text: 'Dashboard spec handed to Data', done: false }], createdAt: d(-15), statusChangedAt: d(-9), startedAt: d(-9), updatedAt: d(-8), focus: true }),
+      T('T-003', { projectId: 'P-02', category: 'Management', title: 'Review SLA with KYC vendor before renewal', why: 'Contract renews in 3 weeks; P95 verification time has doubled since Q1.', objective: 'Reduce KYC cost per case', status: 'blocked', important: true, urgent: true, rice: { reach: 5000, impact: 2, confidence: 100, effort: 1 }, due: dd(-2), stakeholder: 'Procurement · Vendor AM', tags: ['kyc', 'vendor'], dod: [{ text: 'Vendor P95 report received', done: false }, { text: 'Renewal recommendation sent to CFO', done: false }], blockedReason: '', createdAt: d(-30), statusChangedAt: d(-5), startedAt: d(-12), updatedAt: d(-5) }),
+      T('T-004', { projectId: 'P-01', category: 'Delivery', title: 'Write PRD for document upload fallback (manual review)', why: 'Customers with unsupported ID types have no path today; support tickets rising.', objective: 'Cut onboarding drop-off', status: 'next', important: true, urgent: false, rice: { reach: 400, impact: 1, confidence: 80, effort: 2 }, due: dd(9), stakeholder: 'Ops lead', tags: ['onboarding'], dod: [{ text: 'PRD reviewed by Eng and Ops', done: false }], createdAt: d(-10), statusChangedAt: d(-3), updatedAt: d(-3) }),
+      T('T-005', { projectId: 'P-01', category: 'Management', title: 'Prepare Q4 roadmap narrative for exec review', why: 'Exec review on the 18th decides headcount for onboarding squad.', objective: 'Ship SME onboarding v2', status: 'next', important: true, urgent: false, rice: { reach: 20, impact: 3, confidence: 50, effort: 1.5 }, due: dd(12), stakeholder: 'CPO', tags: ['roadmap'], dod: [{ text: 'One-page narrative', done: false }, { text: 'Options with cost/impact', done: false }], createdAt: d(-7), statusChangedAt: d(-7), updatedAt: d(-7) }),
+      T('T-006', { projectId: 'P-01', category: 'Stakeholder', title: 'Answer sales request for custom onboarding demo', why: '', status: 'next', important: false, urgent: true, rice: { reach: 5, impact: 0.5, confidence: 80, effort: 0.5 }, due: dd(1), stakeholder: 'Sales director', tags: ['request'], createdAt: d(-2), statusChangedAt: d(-2), updatedAt: d(-2) }),
+      T('T-007', { projectId: 'P-01', category: 'Product discovery', title: 'Benchmark competitor onboarding time-to-first-transaction', why: 'Board asked how we compare; informs the v2 target.', objective: 'Ship SME onboarding v2', status: 'backlog', important: true, urgent: false, rice: { reach: 50, impact: 1, confidence: 50, effort: 1 }, due: '', stakeholder: 'Strategy', tags: ['research'], createdAt: d(-40), statusChangedAt: d(-40), updatedAt: d(-40) }),
+      T('T-008', { projectId: '', category: '', title: 'Fix typo', why: '', status: 'backlog', important: false, urgent: false, rice: { reach: null, impact: null, confidence: null, effort: null }, tags: [], createdAt: d(-3), statusChangedAt: d(-3), updatedAt: d(-3) }),
+      T('T-009', { projectId: 'P-01', category: 'Product discovery', title: 'Run usability test on new address-capture step', why: 'Address step has 12% abandonment; hypothesis is that autocomplete fails for PO boxes.', objective: 'Cut onboarding drop-off', status: 'review', important: true, urgent: false, rice: { reach: 900, impact: 1, confidence: 80, effort: 1 }, due: dd(3), stakeholder: 'UX research', tags: ['onboarding', 'research'], dod: [{ text: '5 sessions completed', done: true }, { text: 'Findings shared with squad', done: true }, { text: 'Backlog items created', done: false }], createdAt: d(-18), statusChangedAt: d(-2), startedAt: d(-11), updatedAt: d(-2) }),
+      T('T-010', { projectId: 'P-02', category: 'Compliance', title: 'Audit consent copy against updated data-protection guidance', why: 'Legal flagged the consent wording; risk of remediation if not aligned before audit.', objective: 'Reduce KYC cost per case', status: 'backlog', important: true, urgent: true, rice: { reach: 5000, impact: 1, confidence: 80, effort: 1 }, due: dd(6), stakeholder: 'Legal', tags: ['compliance'], createdAt: d(-4), statusChangedAt: d(-4), updatedAt: d(-4) }),
+      T('T-011', { projectId: 'P-01', category: 'Delivery', title: 'Launch in-app progress indicator for onboarding steps', why: 'Users who see progress complete 8% more often in similar flows (internal A/B, Q2).', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: false, rice: { reach: 2000, impact: 1, confidence: 100, effort: 1.5 }, due: dd(-8), stakeholder: 'Design', tags: ['onboarding'], dod: [{ text: 'A/B result reviewed', done: true }, { text: 'Rolled to 100%', done: true }], createdAt: d(-36), statusChangedAt: d(-9), startedAt: d(-22), doneAt: d(-9), updatedAt: d(-9) }),
+      T('T-012', { projectId: 'P-01', category: 'Delivery', title: 'Reduce OTP delivery failures with secondary SMS provider', why: 'OTP failure was the #1 support driver in July.', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: true, rice: { reach: 3000, impact: 2, confidence: 80, effort: 2 }, due: dd(-15), stakeholder: 'Eng lead', tags: ['onboarding', 'platform'], dod: [{ text: 'Failover tested', done: true }, { text: 'Support macro updated', done: true }], createdAt: d(-45), statusChangedAt: d(-16), startedAt: d(-31), doneAt: d(-16), updatedAt: d(-16) }),
+      T('T-013', { projectId: 'P-01', category: 'Management', title: 'Set up weekly onboarding funnel review with Data', why: 'Funnel changes were noticed a month late in Q2.', objective: 'Cut onboarding drop-off', status: 'done', important: true, urgent: false, rice: { reach: 10, impact: 1, confidence: 100, effort: 0.25 }, due: dd(-20), stakeholder: 'Data', tags: ['analytics'], dod: [{ text: 'Recurring meeting and dashboard link', done: true }], createdAt: d(-33), statusChangedAt: d(-24), startedAt: d(-27), doneAt: d(-24), updatedAt: d(-24) }),
+      T('T-014', { projectId: 'P-02', category: 'Compliance', title: 'Migrate KYC decision logs to new audit store', why: 'Audit asked for 7-year retention; current store purges at 2.', objective: 'Reduce KYC cost per case', status: 'done', important: true, urgent: false, rice: { reach: 5000, impact: 0.5, confidence: 80, effort: 3 }, due: dd(-3), stakeholder: 'Compliance · Platform', tags: ['compliance', 'platform'], dod: [{ text: 'Backfill verified by Audit', done: true }, { text: 'Old purge job disabled', done: false }], createdAt: d(-50), statusChangedAt: d(-4), startedAt: d(-35), doneAt: d(-4), updatedAt: d(-4) }),
+      T('T-015', { projectId: 'P-03', category: 'Billing', title: 'Close pricing question from partner bank on per-check fees', why: '', status: 'done', important: false, urgent: true, rice: { reach: 1, impact: 0.5, confidence: 100, effort: 0.25 }, due: dd(-30), stakeholder: 'Partnerships', tags: ['request'], createdAt: d(-34), statusChangedAt: d(-31), startedAt: d(-32), doneAt: d(-31), updatedAt: d(-31) }),
+      T('T-016', { projectId: 'P-01', category: 'Product discovery', title: 'Draft experiment plan: pre-filled company data from registry', why: 'Hypothesis: pre-filling registry data cuts SME form time by 40%.', objective: 'Ship SME onboarding v2', status: 'backlog', important: true, urgent: false, rice: { reach: 600, impact: 2, confidence: 50, effort: 2 }, due: '', stakeholder: 'Eng lead', tags: ['sme', 'experiment'], createdAt: d(-6), statusChangedAt: d(-6), updatedAt: d(-6) })
     ];
   }
   /*SAMPLE-END*/
@@ -687,6 +765,12 @@
       detail: (t) => daysSince(t.updatedAt) + 'd untouched'
     },
     {
+      id: 'no-project', sev: 'info', name: 'Not under a project',
+      why: 'Every task belongs to a project, even a standing one such as “Run the product”. Orphan tasks escape project reviews and status reports.',
+      src: 'Work breakdown structure: every work package rolls up to a deliverable (PMBOK Guide, PMI).',
+      test: (t) => !isDone(t) && Store.projectList().length > 0 && !(t.projectId && Store.project(t.projectId))
+    },
+    {
       id: 'review-cadence', sev: 'info', name: 'Weekly review overdue', global: true,
       why: 'The weekly review is where the system is trusted again: loose ends captured, dates re-planned, next focus chosen. Skip it and the board decays.',
       src: 'Weekly Review (Allen, Getting Things Done, 2001).',
@@ -695,7 +779,7 @@
   ];
 
   function runHealth() {
-    const ts = Store.list();
+    const ts = scoped();
     const s = Store.settings;
     const results = RULES.map((r) => {
       let hits = [];
@@ -719,6 +803,19 @@
     return { results, score, totalHits: results.reduce((a, x) => a + x.hits.length, 0) };
   }
 
+  /* ================= project scope ================= */
+  let scope = 'all';
+  try { scope = localStorage.getItem(LS_SCOPE) || 'all'; } catch (e) { /* ignore */ }
+  function setScope(id) { scope = id || 'all'; try { localStorage.setItem(LS_SCOPE, scope); } catch (e) { /* ignore */ } }
+  function scoped() { return scope === 'all' ? Store.list() : Store.list().filter((t) => t.projectId === scope); }
+  function chipProj(t) { const pr = t.projectId && Store.project(t.projectId); return pr && scope === 'all' ? '<span class="chip proj" title="' + h(pr.name) + '">' + h(pr.code) + '</span>' : ''; }
+  function chipCat(t) { return t.category ? '<span class="chip cat">' + h(t.category) + '</span>' : ''; }
+  function projectStats(id) {
+    const ts = Store.list().filter((t) => t.projectId === id);
+    const open = ts.filter((t) => !isDone(t));
+    return { total: ts.length, open: open.length, done: ts.length - open.length, doing: open.filter((t) => WIP.includes(t.status)).length, overdue: open.filter((t) => t.due && daysUntil(t.due) < 0).length, blocked: open.filter((t) => t.status === 'blocked').length, nextDue: open.filter((t) => t.due).map((t) => t.due).sort()[0] || '' };
+  }
+
   /* ================= rendering helpers ================= */
   function chipQuad(t) { const q = quadrant(t); return '<span class="chip ' + q + '">' + QUADS[q].label + '</span>'; }
   function chipDue(t) {
@@ -732,7 +829,7 @@
     return '<div class="trow" data-open="' + t.id + '">' +
       '<span class="tid">' + h(t.id) + '</span>' +
       '<div><div class="ttl">' + h(t.title) + '</div>' + (t.why ? '<div class="sub">' + h(t.why) + '</div>' : '<div class="sub" style="color:var(--warn)">No outcome stated</div>') + '</div>' +
-      '<div class="meta">' + (extra || '') + (t.status === 'blocked' ? '<span class="chip blocked">Blocked</span>' : '') + chipQuad(t) + chipDue(t) + '</div></div>';
+      '<div class="meta">' + (extra || '') + chipProj(t) + chipCat(t) + (t.status === 'blocked' ? '<span class="chip blocked">Blocked</span>' : '') + chipQuad(t) + chipDue(t) + '</div></div>';
   }
   function tile(label, value, unit, cls, delta) {
     return '<div class="tile"><span class="eyebrow">' + h(label) + '</span><span class="value' + (cls ? ' ' + cls : '') + '">' + h(value) + (unit ? '<span class="unit">' + h(unit) + '</span>' : '') + '</span>' + (delta ? '<span class="delta">' + h(delta) + '</span>' : '') + '</div>';
@@ -745,20 +842,55 @@
   function renderNav() {
     const health = runHealth();
     const counts = {
-      today: Store.list().filter((t) => t.focus && !isDone(t)).length,
-      board: Store.list().filter((t) => WIP.includes(t.status)).length,
-      prioritise: Store.list().filter((t) => (t.status === 'backlog' || t.status === 'next')).length,
+      projects: Store.projectList().filter((x) => x.status === 'active').length,
+      today: scoped().filter((t) => t.focus && !isDone(t)).length,
+      board: scoped().filter((t) => WIP.includes(t.status)).length,
+      prioritise: scoped().filter((t) => (t.status === 'backlog' || t.status === 'next')).length,
       health: health.totalHits,
       metrics: null,
       review: null
     };
     $('#nav').innerHTML = VIEWS.map((v) => '<button class="nav-btn" data-view="' + v.id + '"' + (view === v.id ? ' aria-current="page"' : '') + '><span>' + v.label + '</span>' + (counts[v.id] != null ? '<span class="count' + (v.id === 'health' && counts[v.id] ? ' alert' : '') + '">' + counts[v.id] + '</span>' : '') + '</button>').join('');
     $('#view-title').textContent = VIEWS.find((v) => v.id === view).label;
-    $('#today-label').textContent = fmtLong(now());
+    const pr = scope !== 'all' && Store.project(scope);
+    $('#today-label').textContent = fmtLong(now()) + (pr ? ' · ' + pr.name : '');
+    const sel = $('#project-scope');
+    const list = Store.projectList();
+    sel.innerHTML = '<option value="all">All projects (' + Store.list().length + ')</option>' + list.map((x) => '<option value="' + x.id + '"' + (x.id === scope ? ' selected' : '') + '>' + h(x.code + ' · ' + x.name) + (x.status !== 'active' ? ' (' + PSTATUS.find((q) => q.id === x.status).label.toLowerCase() + ')' : '') + '</option>').join('');
+    sel.value = scope;
   }
 
+  function renderProjects() {
+    const list = Store.projectList();
+    const cats = Store.settings.categories || [];
+    const all = Store.list();
+    let html = '<div class="row"><p class="ink2 grow" style="max-width:72ch">A project is a container with a sponsor, an objective and a target date. Every task belongs to one. Open a project to scope every other view to it, or keep “All projects” for the cross-project picture.</p><button class="btn primary" data-act="new-project">New project</button></div>';
+    if (!list.length) html += '<div class="panel"><div class="empty">No projects yet. Create one, or load the example set from Settings &amp; data.</div></div>';
+    html += '<div class="pgrid">' + list.map((pr) => {
+      const st = projectStats(pr.id);
+      const pctDone = st.total ? Math.round(100 * st.done / st.total) : 0;
+      const due = pr.due ? daysUntil(pr.due) : null;
+      return '<div class="pcard ' + pr.status + '"><div class="ph"><span class="chip proj">' + h(pr.code) + '</span><h3>' + h(pr.name) + '</h3><span class="chip pstat ' + pr.status + '">' + PSTATUS.find((q) => q.id === pr.status).label + '</span></div>' +
+        (pr.description ? '<p class="pdesc">' + h(pr.description) + '</p>' : '') +
+        '<div class="small muted">' + (pr.sponsor ? 'Sponsor ' + h(pr.sponsor) : 'No sponsor') + (pr.objective ? ' · ' + h(pr.objective) : '') + (pr.due ? ' · target ' + fmtDate(pr.due) + (due < 0 && pr.status !== 'done' ? ' <span class="chip due over">' + Math.abs(due) + 'd late</span>' : '') : '') + '</div>' +
+        '<div><div class="row small" style="justify-content:space-between"><span class="muted">' + st.done + ' of ' + st.total + ' tasks done</span><span class="mono muted">' + pctDone + '%</span></div><div class="bar-track" style="margin-top:4px"><div class="bar-fill" style="width:' + pctDone + '%"></div></div></div>' +
+        '<div class="pstats"><div class="pstat-cell"><span class="n">' + st.open + '</span><span class="l">Open</span></div><div class="pstat-cell"><span class="n">' + st.doing + '</span><span class="l">In flight</span></div><div class="pstat-cell"><span class="n' + (st.overdue ? ' crit' : '') + '">' + st.overdue + '</span><span class="l">Overdue</span></div><div class="pstat-cell"><span class="n' + (st.blocked ? ' warn' : '') + '">' + st.blocked + '</span><span class="l">Blocked</span></div></div>' +
+        '<div class="pfoot"><button class="btn sm primary" data-project-open="' + pr.id + '">Open project</button><button class="btn sm" data-project-edit="' + pr.id + '">Edit</button><span class="grow"></span>' + (st.nextDue ? '<span class="small muted">Next due ' + fmtDate(st.nextDue) + '</span>' : '') + '</div></div>';
+    }).join('') + '</div>';
+    const orphans = all.filter((t) => !isDone(t) && !(t.projectId && Store.project(t.projectId)));
+    if (orphans.length) html += '<div class="panel"><div class="panel-head"><h2>Tasks without a project <span class="chip q3">' + orphans.length + '</span></h2><span class="small muted">Open each one and assign a project.</span></div><div class="panel-body tight"><div class="tlist">' + orphans.map((t) => taskRow(t)).join('') + '</div></div></div>';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Categories</h2><p class="small muted">The type of work a task is, across projects. Management, billing, discovery, delivery, compliance… Add your own.</p></div><form class="row" id="cat-form"><input type="text" id="new-cat" placeholder="New category" aria-label="New category" style="width:200px"><button class="btn sm" type="submit">Add</button></form></div><div class="panel-body tight">' +
+      (cats.length ? cats.map((c) => { const n = all.filter((t) => t.category === c && !isDone(t)).length; return '<div class="cat-row"><span>' + h(c) + '</span><span class="mono small muted">' + n + ' open</span><button class="btn sm ghost" data-cat-del="' + h(c) + '"' + (all.some((t) => t.category === c) ? ' title="In use: tasks keep the label if removed"' : '') + '>Remove</button></div>'; }).join('') : '<div class="empty">No categories yet.</div>') + '</div></div>';
+    $('#content').innerHTML = html;
+    $('#cat-form').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#new-cat').value.trim(); if (!v) return; addCategory(v); });
+  }
+  function addCategory(name) {
+    const cats = Store.settings.categories || (Store.settings.categories = []);
+    if (cats.some((c) => c.toLowerCase() === name.toLowerCase())) { toast('Category already exists'); return cats.find((c) => c.toLowerCase() === name.toLowerCase()); }
+    cats.push(name); Store.saveSettings(); toast('Added category ' + name); return name;
+  }
   function renderToday() {
-    const ts = Store.list();
+    const ts = scoped();
     const open = ts.filter((t) => !isDone(t));
     const focus = open.filter((t) => t.focus);
     const overdue = open.filter((t) => t.due && daysUntil(t.due) < 0).sort((a, b) => a.due.localeCompare(b.due));
@@ -773,7 +905,9 @@
 
     let html = '';
     if (!ts.length) {
-      html += '<div class="panel"><div class="empty"><h2 style="margin-bottom:6px">Nothing here yet</h2><p>Capture your first task above, or load a set of example tasks to see how every view behaves.</p><p style="margin-top:12px"><button class="btn primary" data-act="load-sample">Load example tasks</button></p></div></div>';
+      html += scope === 'all'
+        ? '<div class="panel"><div class="empty"><h2 style="margin-bottom:6px">Nothing here yet</h2><p>Create a project, then capture your first task above. Or load the example set to see how every view behaves.</p><p style="margin-top:12px"><button class="btn primary" data-act="new-project">Create a project</button> <button class="btn" data-act="load-sample">Load example tasks</button></p></div></div>'
+        : '<div class="panel"><div class="empty"><h2 style="margin-bottom:6px">No tasks in this project yet</h2><p>Anything you capture above lands in this project’s backlog.</p></div></div>';
       $('#content').innerHTML = html; return;
     }
     if (hasSample) html += '<div class="row small muted"><span class="chip sample">Examples</span><span>Tasks marked as examples are illustrative. Replace them from Settings &amp; data when you are ready.</span></div>';
@@ -801,6 +935,11 @@
       (blocked.length ? blocked.map((t) => taskRow(t, t.blockedReason ? '<span class="small muted">' + h(t.blockedReason) + '</span>' : '<span class="small" style="color:var(--warn)">No blocker named</span>')).join('') : '<div class="empty">Nothing blocked.</div>') + '</div></div></div>';
     html += '</div>';
 
+    const recent = open.filter((t) => t.status === 'backlog').sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).slice(0, 5);
+    if (recent.length) {
+      html += '<div class="panel"><div class="panel-head"><h2>Recently captured · to clarify</h2><span class="small muted">Open each one: add the outcome, a category, flags and a date, then move it to Next or leave it in Backlog.</span></div><div class="panel-body tight"><div class="tlist">' +
+        recent.map((t) => taskRow(t, '<span class="small muted mono">' + fmtDate(t.createdAt) + '</span>')).join('') + '</div></div></div>';
+    }
     const q1Unfocused = open.filter((t) => quadrant(t) === 'q1' && !t.focus);
     if (q1Unfocused.length) {
       html += '<div class="panel"><div class="panel-head"><h2>Do first, not yet in focus</h2><span class="small muted">Important and urgent. Either focus them today or admit they are not urgent.</span></div><div class="panel-body tight"><div class="tlist">' +
@@ -810,8 +949,8 @@
   }
 
   function renderBoard() {
-    const ts = Store.list().filter((t) => !search || (t.title + ' ' + t.id + ' ' + (t.tags || []).join(' ')).toLowerCase().includes(search));
-    let html = '<div class="row"><input type="text" id="board-search" placeholder="Filter by title, id or tag" value="' + h(search) + '" style="max-width:320px" aria-label="Filter board"><span class="small muted">Drag cards between columns. Age shows days in the current column. <kbd>n</kbd> new task.</span></div>';
+    const ts = scoped().filter((t) => !search || (t.title + ' ' + t.id + ' ' + (t.tags || []).join(' ')).toLowerCase().includes(search));
+    let html = '<div class="row"><input type="text" id="board-search" placeholder="Filter by title, id or tag" value="' + h(search) + '" style="max-width:320px" aria-label="Filter board"><span class="small muted">Drag cards between columns. Age shows days in the current column. <kbd>n</kbd> new task, <kbd>p</kbd> new project.</span></div>';
     html += '<div class="board">' + STATUSES.map((s) => {
       const items = ts.filter((t) => t.status === s.id).sort((a, b) => (quadrant(a) > quadrant(b) ? 1 : quadrant(a) < quadrant(b) ? -1 : (a.due || '9').localeCompare(b.due || '9')));
       const lim = Store.settings.wip[s.id];
@@ -821,7 +960,7 @@
         shown.map((t) => {
           const age = ageInStatus(t);
           const stale = WIP.includes(t.status) && daysSince(t.updatedAt) > Store.settings.staleDays;
-          return '<div class="card' + (isDone(t) ? ' done' : '') + '" draggable="true" data-open="' + t.id + '" data-drag="' + t.id + '"><div class="stripe ' + quadrant(t) + '"></div><div class="top"><span class="tid">' + h(t.id) + '</span>' + (t.focus && !isDone(t) ? '<span class="chip focus">Focus</span>' : '') + '</div><div class="title">' + h(t.title) + '</div><div class="foot">' + chipDue(t) + (t.status === 'blocked' && t.blockedReason ? '<span class="small muted">' + h(t.blockedReason) + '</span>' : '') + '<span class="age' + (stale ? ' old' : '') + '" title="Days in this column">' + (isDone(t) ? '' : age + 'd') + '</span></div></div>';
+          return '<div class="card' + (isDone(t) ? ' done' : '') + '" draggable="true" data-open="' + t.id + '" data-drag="' + t.id + '"><div class="stripe ' + quadrant(t) + '"></div><div class="top"><span class="tid">' + h(t.id) + '</span>' + (t.focus && !isDone(t) ? '<span class="chip focus">Focus</span>' : '') + '</div><div class="title">' + h(t.title) + '</div><div class="foot">' + chipProj(t) + chipCat(t) + chipDue(t) + (t.status === 'blocked' && t.blockedReason ? '<span class="small muted">' + h(t.blockedReason) + '</span>' : '') + '<span class="age' + (stale ? ' old' : '') + '" title="Days in this column">' + (isDone(t) ? '' : age + 'd') + '</span></div></div>';
         }).join('') +
         (s.id === 'done' && items.length > 8 ? '<div class="small muted" style="padding:4px">+ ' + (items.length - 8) + ' more in Metrics</div>' : '') +
         '</div>';
@@ -861,7 +1000,7 @@
     const tab = Store.settings.prioTab || 'rice';
     let html = '<div class="tabs"><button class="tab" data-tab="rice" aria-selected="' + (tab === 'rice') + '">RICE ranking</button><button class="tab" data-tab="matrix" aria-selected="' + (tab === 'matrix') + '">Eisenhower matrix</button></div>';
     if (tab === 'rice') {
-      const rows = Store.list().filter((t) => !isDone(t)).map((t) => ({ t, s: riceScore(t) })).sort((a, b) => (b.s == null ? -1 : b.s) - (a.s == null ? -1 : a.s));
+      const rows = scoped().filter((t) => !isDone(t)).map((t) => ({ t, s: riceScore(t) })).sort((a, b) => (b.s == null ? -1 : b.s) - (a.s == null ? -1 : a.s));
       html += '<div class="panel"><div class="panel-head"><div><h2>RICE ranking of open work</h2><p class="small muted">Score = Reach × Impact × Confidence ÷ Effort. Edit the inputs in place. Reach is people or cases per quarter, effort is person-weeks.</p></div><span class="small muted">' + rows.filter((r) => r.s == null).length + ' unscored</span></div>' +
         '<div class="panel-body tight" style="overflow-x:auto"><table class="data"><thead><tr><th>#</th><th>Task</th><th>Status</th><th class="num">Reach</th><th>Impact</th><th>Confidence</th><th class="num">Effort</th><th class="num">Score</th><th></th></tr></thead><tbody>' +
         rows.map((r, i) => {
@@ -875,7 +1014,7 @@
             '<td><select data-status="' + t.id + '" aria-label="Status">' + STATUSES.map((s) => '<option value="' + s.id + '"' + (s.id === t.status ? ' selected' : '') + '>' + s.label + '</option>').join('') + '</select></td></tr>';
         }).join('') + '</tbody></table></div></div>';
     } else {
-      const open = Store.list().filter((t) => !isDone(t));
+      const open = scoped().filter((t) => !isDone(t));
       html += '<p class="small muted">Toggle I (important: moves an objective) and U (urgent: has a real deadline in days). A PM who lives in Schedule ships strategy; one who lives in Do first ships fire-fighting.</p>';
       html += '<div class="matrix">' + ['q1', 'q2', 'q3', 'q4'].map((q) => {
         const items = open.filter((t) => quadrant(t) === q);
@@ -956,7 +1095,7 @@
   }
 
   function renderMetrics() {
-    const ts = Store.list();
+    const ts = scoped();
     const done = ts.filter((t) => t.doneAt);
     const weeks = [];
     for (let i = 7; i >= 0; i--) { const m = mondayOf(now()); m.setDate(m.getDate() - i * 7); weeks.push(m); }
@@ -972,6 +1111,10 @@
     const quadCounts = ['q1', 'q2', 'q3', 'q4'].map((q) => ({ label: QUADS[q].label, value: ts.filter((t) => !isDone(t) && quadrant(t) === q).length, tip: QUADS[q].label }));
     const objCounts = (Store.settings.objectives || []).map((o) => ({ o, n: ts.filter((t) => !isDone(t) && t.objective === o).length }));
     const unlinked = ts.filter((t) => !isDone(t) && !(t.objective || '').trim()).length;
+    const openTs = ts.filter((t) => !isDone(t));
+    const byProject = Store.projectList().map((pr) => ({ label: pr.code + ' · ' + pr.name, n: openTs.filter((t) => t.projectId === pr.id).length, od: openTs.filter((t) => t.projectId === pr.id && t.due && daysUntil(t.due) < 0).length })).filter((x) => scope === 'all' || x.n);
+    const byCat = (Store.settings.categories || []).map((c) => ({ label: c, n: openTs.filter((t) => t.category === c).length, od: openTs.filter((t) => t.category === c && t.due && daysUntil(t.due) < 0).length }));
+    const noCat = openTs.filter((t) => !t.category).length;
 
     let html = '<div class="grid-4">' +
       tile('Throughput · last 4 weeks', last4, 'done', '', prev4 ? (last4 >= prev4 ? '+' : '') + (last4 - prev4) + ' vs previous 4 weeks' : 'No earlier baseline') +
@@ -992,6 +1135,10 @@
       dotChart(done.sort((a, b) => cycleDays(b) - cycleDays(a)).slice(0, 12).map((t) => ({ label: t.id + " " + t.title.slice(0, 13), value: cycleDays(t), color: 'var(--s1)', tip: t.title + ' · ' + cycleDays(t) + ' days' })), { aria: 'Cycle time per task', ref: p85, refLabel: p85 != null ? 'P85 ' + p85 + 'd' : '' }) + '</div></div>';
     html += '<div class="panel"><div class="panel-head"><div><h2>Where open work sits</h2><p class="small muted">By Eisenhower quadrant, and by objective.</p></div></div><div class="panel-body">' + barChart(quadCounts, { aria: 'Open tasks by quadrant' }) +
       '<table class="data" style="margin-top:10px"><thead><tr><th>Objective</th><th class="num">Open tasks</th></tr></thead><tbody>' + objCounts.map((x) => '<tr><td>' + h(x.o) + '</td><td class="num">' + x.n + '</td></tr>').join('') + '<tr><td class="muted">Not linked to an objective</td><td class="num">' + unlinked + '</td></tr></tbody></table></div></div>';
+    html += '</div>';
+    html += '<div class="grid-2">';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Open work by project</h2><p class="small muted">Where the load and the lateness sit.</p></div></div><div class="panel-body tight"><table class="data"><thead><tr><th>Project</th><th class="num">Open</th><th class="num">Overdue</th></tr></thead><tbody>' + (byProject.map((x) => '<tr><td>' + h(x.label) + '</td><td class="num">' + x.n + '</td><td class="num' + (x.od ? '" style="color:var(--crit)' : '') + '">' + x.od + '</td></tr>').join('') || '<tr><td colspan="3" class="muted">No projects yet</td></tr>') + '</tbody></table></div></div>';
+    html += '<div class="panel"><div class="panel-head"><div><h2>Open work by category</h2><p class="small muted">Is management work crowding out discovery and delivery?</p></div></div><div class="panel-body tight"><table class="data"><thead><tr><th>Category</th><th class="num">Open</th><th class="num">Overdue</th></tr></thead><tbody>' + byCat.map((x) => '<tr><td>' + h(x.label) + '</td><td class="num">' + x.n + '</td><td class="num' + (x.od ? '" style="color:var(--crit)' : '') + '">' + x.od + '</td></tr>').join('') + '<tr><td class="muted">No category</td><td class="num">' + noCat + '</td><td class="num"></td></tr></tbody></table></div></div>';
     html += '</div>';
     $('#content').innerHTML = html;
     bindTooltips();
@@ -1019,7 +1166,7 @@
   ];
 
   function buildReport() {
-    const ts = Store.list();
+    const ts = scoped();
     const monday = mondayOf(now());
     const nextMonday = new Date(monday); nextMonday.setDate(monday.getDate() + 7);
     const doneWeek = ts.filter((t) => t.doneAt && new Date(t.doneAt) >= monday);
@@ -1028,7 +1175,8 @@
     const focus = ts.filter((t) => t.focus && !isDone(t));
     const hc = runHealth();
     const line = (t, extra) => '  • ' + t.id + '  ' + t.title + (extra ? '  (' + extra + ')' : '');
-    let r = 'WEEKLY REVIEW · week of ' + fmtDate(ymd(monday)) + ' · ' + fmtLong(now()) + '\n\n';
+    const prj = scope !== 'all' && Store.project(scope);
+    let r = 'WEEKLY REVIEW · ' + (prj ? prj.name + ' · ' : 'all projects · ') + 'week of ' + fmtDate(ymd(monday)) + ' · ' + fmtLong(now()) + '\n\n';
     r += 'DONE THIS WEEK (' + doneWeek.length + ')\n' + (doneWeek.map((t) => line(t, t.objective)).join('\n') || '  —') + '\n\n';
     r += 'CARRIED OVER (' + carried.length + ')\n' + (carried.map((t) => line(t, statusLabel(t.status) + ', ' + ageInStatus(t) + 'd in column' + (t.due ? ', due ' + fmtDate(t.due) : ''))).join('\n') || '  —') + '\n\n';
     r += 'BLOCKED / WAITING (' + blocked.length + ')\n' + (blocked.map((t) => line(t, t.blockedReason || 'blocker not named')).join('\n') || '  —') + '\n\n';
@@ -1060,13 +1208,13 @@
 
   function render() {
     renderNav();
-    ({ today: renderToday, board: renderBoard, prioritise: renderPrioritise, health: renderHealth, metrics: renderMetrics, review: renderReview }[view])();
+    ({ projects: renderProjects, today: renderToday, board: renderBoard, prioritise: renderPrioritise, health: renderHealth, metrics: renderMetrics, review: renderReview }[view])();
   }
 
   /* ================= drawer ================= */
   function blankTask(title) {
     const ts = iso(now());
-    return { id: Store.newId(), title: title || '', why: '', objective: '', status: 'backlog', important: false, urgent: false, rice: { reach: null, impact: null, confidence: null, effort: null }, due: '', stakeholder: '', tags: [], dod: [], notes: '', blockedReason: '', focus: false, sample: false, createdAt: ts, updatedAt: ts, statusChangedAt: ts, startedAt: null, doneAt: null };
+    return { id: Store.newId(), projectId: scope !== 'all' ? scope : '', category: '', title: title || '', why: '', objective: '', status: 'backlog', important: false, urgent: false, rice: { reach: null, impact: null, confidence: null, effort: null }, due: '', stakeholder: '', tags: [], dod: [], notes: '', blockedReason: '', focus: false, sample: false, createdAt: ts, updatedAt: ts, statusChangedAt: ts, startedAt: null, doneAt: null };
   }
   let draft = null;
   function openDrawer(id) {
@@ -1080,12 +1228,16 @@
   function drawDrawer() {
     const t = draft; const rc = t.rice;
     const objs = Store.settings.objectives || [];
+    const cats = Store.settings.categories || [];
+    const projs = Store.projectList();
     const score = riceScore(t);
     $('#overlay').innerHTML = '<div class="scrim" data-close></div><aside class="drawer" role="dialog" aria-label="Task">' +
       '<div class="drawer-head"><span class="mono small muted">' + h(t.id) + '</span><h2 class="grow">' + (t._new ? 'New task' : 'Edit task') + '</h2>' + (t.sample ? '<span class="chip sample">Example</span>' : '') + '<button class="btn icon ghost" data-close aria-label="Close">✕</button></div>' +
       '<div class="drawer-body">' +
       '<label class="field">Title · verb + object<input type="text" data-f="title" value="' + h(t.title) + '" placeholder="Draft, Decide, Ship, Review, Align…"></label>' +
       '<label class="field">Why · which outcome does this move?<textarea data-f="why" placeholder="The metric, risk or decision this task changes. If you cannot write one, question the task.">' + h(t.why) + '</textarea></label>' +
+      '<div class="grid-2"><label class="field">Project<select data-f="projectId"><option value="">— none —</option>' + projs.map((pr) => '<option value="' + pr.id + '"' + (pr.id === t.projectId ? ' selected' : '') + '>' + h(pr.code + ' · ' + pr.name) + '</option>').join('') + '<option value="__new">+ New project…</option></select></label>' +
+      '<label class="field">Category<select data-f="category"><option value="">— none —</option>' + cats.map((c) => '<option' + (c === t.category ? ' selected' : '') + '>' + h(c) + '</option>').join('') + (t.category && !cats.includes(t.category) ? '<option selected>' + h(t.category) + '</option>' : '') + '<option value="__new">+ New category…</option></select></label></div>' +
       '<div class="grid-2"><label class="field">Objective<select data-f="objective"><option value="">— none —</option>' + objs.map((o) => '<option' + (o === t.objective ? ' selected' : '') + '>' + h(o) + '</option>').join('') + '</select></label>' +
       '<label class="field">Status<select data-f="status">' + STATUSES.map((s) => '<option value="' + s.id + '"' + (s.id === t.status ? ' selected' : '') + '>' + s.label + '</option>').join('') + '</select></label></div>' +
       '<div class="fieldset"><span class="eyebrow">Eisenhower</span><div class="row"><label class="check"><input type="checkbox" data-f="important"' + (t.important ? ' checked' : '') + '> Important · moves an objective</label><label class="check"><input type="checkbox" data-f="urgent"' + (t.urgent ? ' checked' : '') + '> Urgent · real deadline within days</label><span class="grow"></span>' + chipQuad(t) + '</div></div>' +
@@ -1113,6 +1265,8 @@
     const el = e.target; const t = draft;
     if (el.dataset.f) {
       const f = el.dataset.f;
+      if (f === 'category' && el.value === '__new') { const name = (prompt('New category name') || '').trim(); t.category = name ? addCategory(name) : ''; drawDrawer(); return; }
+      if (f === 'projectId' && el.value === '__new') { const name = (prompt('New project name') || '').trim(); if (name) { const pr = quickProject(name); t.projectId = pr.id; } drawDrawer(); return; }
       if (el.type === 'checkbox') t[f] = el.checked;
       else if (f === 'tags') t.tags = el.value.split(',').map((x) => x.trim()).filter(Boolean);
       else t[f] = el.value;
@@ -1144,6 +1298,56 @@
   }
   function closeOverlay() { $('#overlay').innerHTML = ''; draft = null; }
 
+  /* ================= project modal ================= */
+  function codeFor(name) {
+    const words = name.replace(/[^A-Za-z0-9 ]/g, ' ').trim().split(/\s+/).filter(Boolean);
+    let code = words.length >= 2 ? words.map((w) => w[0]).join('').slice(0, 4) : (words[0] || 'PRJ').slice(0, 4);
+    code = code.toUpperCase();
+    const taken = new Set(Store.projectList().map((p) => p.code));
+    let c = code, i = 2; while (taken.has(c)) { c = code + i++; }
+    return c;
+  }
+  function blankProject(name) {
+    const ts = iso(now());
+    return { id: Store.newProjectId(), code: codeFor(name || ''), name: name || '', description: '', status: 'active', sponsor: '', objective: '', due: '', sample: false, createdAt: ts, updatedAt: ts };
+  }
+  function quickProject(name) { const pr = blankProject(name); Store.projects[pr.id] = pr; Store.saveProject(pr); toast('Created project ' + pr.code); return pr; }
+  let pdraft = null;
+  function openProject(id) {
+    const src = id ? Store.project(id) : null;
+    pdraft = src ? JSON.parse(JSON.stringify(src)) : blankProject('');
+    if (!src) pdraft._new = true;
+    const pr = pdraft; const objs = Store.settings.objectives || [];
+    const st = src ? projectStats(pr.id) : { total: 0 };
+    $('#overlay').innerHTML = '<div class="scrim" data-close></div><div class="modal"><div class="modal-box" role="dialog" aria-label="Project">' +
+      '<div class="drawer-head"><span class="mono small muted">' + h(pr.id) + '</span><h2 class="grow">' + (pr._new ? 'New project' : 'Edit project') + '</h2>' + (pr.sample ? '<span class="chip sample">Example</span>' : '') + '<button class="btn icon ghost" data-close aria-label="Close">✕</button></div>' +
+      '<div class="drawer-body" id="project-form">' +
+      '<div class="grid-2" style="grid-template-columns:1fr 120px"><label class="field">Name<input type="text" data-p="name" value="' + h(pr.name) + '" placeholder="Onboarding v2"></label><label class="field">Code<input type="text" data-p="code" value="' + h(pr.code) + '" maxlength="6" style="font-family:var(--font-mono);text-transform:uppercase"></label></div>' +
+      '<label class="field">What done looks like<textarea data-p="description" placeholder="The deliverable and the change it makes. One or two sentences.">' + h(pr.description) + '</textarea></label>' +
+      '<div class="grid-3"><label class="field">Status<select data-p="status">' + PSTATUS.map((q) => '<option value="' + q.id + '"' + (q.id === pr.status ? ' selected' : '') + '>' + q.label + '</option>').join('') + '</select></label>' +
+      '<label class="field">Sponsor<input type="text" data-p="sponsor" value="' + h(pr.sponsor) + '" placeholder="Who owns the outcome"></label>' +
+      '<label class="field">Target date<input type="date" data-p="due" value="' + h(pr.due) + '"></label></div>' +
+      '<label class="field">Objective it serves<select data-p="objective"><option value="">— none —</option>' + objs.map((o) => '<option' + (o === pr.objective ? ' selected' : '') + '>' + h(o) + '</option>').join('') + '</select></label>' +
+      (pr._new ? '' : '<p class="small muted">' + st.total + ' task' + (st.total === 1 ? '' : 's') + ' in this project. ' + (st.total ? 'Delete is disabled while tasks remain; mark it Completed or On hold instead.' : '') + '</p>') +
+      '</div><div class="drawer-foot"><button class="btn primary" data-save-project>Save project</button><button class="btn" data-close>Cancel</button><span class="grow"></span>' + (pr._new || st.total ? '' : '<button class="btn danger" data-delete-project>Delete</button>') + '</div></div></div>';
+    const form = $('#project-form');
+    const onInput = (e) => { const el = e.target; if (!el.dataset.p) return; pr[el.dataset.p] = el.dataset.p === 'code' ? el.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) : el.value; if (el.dataset.p === 'name' && pr._new && !pr._codeTouched) { pr.code = codeFor(pr.name); form.querySelector('[data-p="code"]').value = pr.code; } if (el.dataset.p === 'code') pr._codeTouched = true; };
+    form.addEventListener('input', onInput); form.addEventListener('change', onInput);
+    setTimeout(() => { const f = form.querySelector('[data-p="name"]'); if (f && pr._new) f.focus(); }, 30);
+  }
+  function saveProjectDraft() {
+    const pr = pdraft;
+    if (!pr.name.trim()) { toast('Give the project a name'); return; }
+    if (!pr.code) pr.code = codeFor(pr.name);
+    const clash = Store.projectList().find((x) => x.code === pr.code && x.id !== pr.id);
+    if (clash) { toast('Code ' + pr.code + ' is already used by ' + clash.name); return; }
+    const isNew = pr._new; delete pr._new; delete pr._codeTouched;
+    closeOverlay();
+    Store.saveProject(pr);
+    if (isNew) { setScope(pr.id); view = 'today'; render(); }
+    toast('Saved project ' + pr.code);
+  }
+
   /* ================= settings modal ================= */
   function openSettings() {
     const s = Store.settings;
@@ -1157,11 +1361,12 @@
       '<label class="field">Blocked too long after<input type="number" min="1" data-s="blockedDays" value="' + s.blockedDays + '"></label>' +
       '<label class="field">Backlog untouched after<input type="number" min="7" data-s="backlogAgeDays" value="' + s.backlogAgeDays + '"></label></div></div>' +
       '<div class="fieldset"><span class="eyebrow">Objectives · one per line</span><p class="small muted">Your current OKRs or quarterly goals. Tasks link to one of these.</p><textarea id="objectives" style="min-height:90px">' + h((s.objectives || []).join('\n')) + '</textarea></div>' +
+      '<div class="fieldset"><span class="eyebrow">Categories · one per line</span><p class="small muted">The kind of work a task is. Renaming here does not rename tasks already labelled.</p><textarea id="categories" style="min-height:90px">' + h((s.categories || []).join('\n')) + '</textarea></div>' +
       '<div class="fieldset"><span class="eyebrow">Data</span><div class="row">' +
       '<button class="btn" data-act="export-json">Export JSON backup</button><button class="btn" data-act="export-csv">Export CSV for Jira / Sheets</button>' +
       '<label class="btn" style="cursor:pointer">Import JSON<input type="file" id="import-file" accept="application/json" style="display:none"></label></div>' +
       '<div class="row"><button class="btn" data-act="load-sample">Load example tasks</button><button class="btn danger" data-act="clear-sample">Remove example tasks</button><button class="btn danger" data-act="clear-all">Delete everything</button></div>' +
-      '<p class="small muted">' + (Store.mode === 'db' ? 'Tasks are stored with this page in your Claude workspace and update live wherever you open it.' : 'Tasks are stored in this browser only. Export a backup before clearing site data or switching devices.') + '</p></div>' +
+      '<p class="small muted">' + (Store.mode === 'db' ? 'Projects, tasks and settings are stored server-side with this page in your Claude workspace. They persist across devices and browsers and update live wherever you open the page.' : 'Projects, tasks and settings are stored in this browser only (no server). Export a backup before clearing site data or switching devices.') + '</p></div>' +
       '</div><div class="drawer-foot"><button class="btn primary" data-save-settings>Save settings</button><button class="btn" data-close>Close</button></div></div></div>';
     $('#import-file').addEventListener('change', importJson);
   }
@@ -1170,6 +1375,7 @@
     document.querySelectorAll('[data-wip]').forEach((el) => { s.wip[el.dataset.wip] = Math.max(1, Number(el.value) || 1); });
     document.querySelectorAll('[data-s]').forEach((el) => { s[el.dataset.s] = Math.max(1, Number(el.value) || 1); });
     s.objectives = $('#objectives').value.split('\n').map((x) => x.trim()).filter(Boolean);
+    s.categories = $('#categories').value.split('\n').map((x) => x.trim()).filter(Boolean);
     Store.saveSettings();
     closeOverlay(); render(); toast('Settings saved');
   }
@@ -1183,12 +1389,12 @@
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   }
-  function exportJson() { download('pm-flightdeck-' + todayYmd() + '.json', JSON.stringify({ exportedAt: iso(now()), settings: Store.settings, tasks: Store.list() }, null, 2), 'application/json'); }
+  function exportJson() { download('pm-flightdeck-' + todayYmd() + '.json', JSON.stringify({ exportedAt: iso(now()), settings: Store.settings, projects: Store.projectList(), tasks: Store.list() }, null, 2), 'application/json'); }
   function exportCsv() {
     const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    const head = ['Issue key', 'Summary', 'Description', 'Status', 'Priority', 'Due date', 'Labels', 'Objective', 'Stakeholder', 'RICE score', 'Reach', 'Impact', 'Confidence', 'Effort', 'Created', 'Started', 'Done'];
+    const head = ['Issue key', 'Project', 'Category', 'Summary', 'Description', 'Status', 'Priority', 'Due date', 'Labels', 'Objective', 'Stakeholder', 'RICE score', 'Reach', 'Impact', 'Confidence', 'Effort', 'Created', 'Started', 'Done'];
     const prio = { q1: 'Highest', q2: 'High', q3: 'Medium', q4: 'Low' };
-    const rows = Store.list().map((t) => [t.id, t.title, (t.why ? 'Why: ' + t.why + '\n' : '') + (t.notes || ''), statusLabel(t.status), prio[quadrant(t)], t.due, (t.tags || []).join(' '), t.objective, t.stakeholder, fmtScore(riceScore(t)), t.rice && t.rice.reach, t.rice && t.rice.impact, t.rice && t.rice.confidence, t.rice && t.rice.effort, ymd(t.createdAt), t.startedAt ? ymd(t.startedAt) : '', t.doneAt ? ymd(t.doneAt) : ''].map(esc).join(','));
+    const rows = Store.list().map((t) => [t.id, (Store.project(t.projectId) || {}).name || '', t.category || '', t.title, (t.why ? 'Why: ' + t.why + '\n' : '') + (t.notes || ''), statusLabel(t.status), prio[quadrant(t)], t.due, (t.tags || []).join(' '), t.objective, t.stakeholder, fmtScore(riceScore(t)), t.rice && t.rice.reach, t.rice && t.rice.impact, t.rice && t.rice.confidence, t.rice && t.rice.effort, ymd(t.createdAt), t.startedAt ? ymd(t.startedAt) : '', t.doneAt ? ymd(t.doneAt) : ''].map(esc).join(','));
     download('pm-flightdeck-' + todayYmd() + '.csv', head.map(esc).join(',') + '\n' + rows.join('\n'), 'text/csv');
   }
   function importJson(e) {
@@ -1201,7 +1407,8 @@
         if (!tasks.length) throw new Error('No tasks found in file');
         if (!confirm('Replace the current ' + Store.list().length + ' tasks with ' + tasks.length + ' from this file?')) return;
         closeOverlay();
-        Store.replaceAll(tasks, data.settings);
+        const projects = Array.isArray(data.projects) ? data.projects : data.projects ? Object.values(data.projects) : null;
+        Store.replaceAll(tasks, data.settings, projects);
         toast('Imported ' + tasks.length + ' tasks');
       } catch (err) { toast('Import failed: ' + err.message); }
     };
@@ -1211,17 +1418,27 @@
     const existing = Store.list().filter((t) => !t.sample);
     const ids = new Set(existing.map((t) => t.id));
     const samples = sampleTasks().filter((t) => !ids.has(t.id));
+    const existingP = Store.projectList().filter((p) => !p.sample);
+    const pids = new Set(existingP.map((p) => p.id));
+    const sampleP = sampleProjects().filter((p) => !pids.has(p.id));
     Store.settings.sampleLoaded = true;
     Store.settings.seq = Math.max(Store.settings.seq || 1, 17);
-    Store.replaceAll(existing.concat(samples), Store.settings);
+    Store.settings.pseq = Math.max(Store.settings.pseq || 1, 4);
+    (Store.settings.categories || []).length || (Store.settings.categories = DEFAULT_SETTINGS.categories.slice());
+    Store.replaceAll(existing.concat(samples), Store.settings, existingP.concat(sampleP));
     closeOverlay(); toast('Example tasks loaded');
   }
 
   /* ================= events ================= */
   document.addEventListener('click', (e) => {
-    const el = e.target.closest('[data-view],[data-open],[data-close],[data-save],[data-delete],[data-act],[data-tab],[data-flag],[data-focus],[data-unfocus],[data-dod-add],[data-dod-del],[data-save-settings],[data-goto],#btn-settings');
+    const el = e.target.closest('[data-view],[data-open],[data-close],[data-save],[data-delete],[data-act],[data-tab],[data-flag],[data-focus],[data-unfocus],[data-dod-add],[data-dod-del],[data-save-settings],[data-goto],[data-project-open],[data-project-edit],[data-save-project],[data-delete-project],[data-cat-del],#btn-settings');
     if (!el) return;
     if (el.id === 'btn-settings') { openSettings(); return; }
+    if (el.dataset.projectOpen) { setScope(el.dataset.projectOpen); view = 'today'; render(); return; }
+    if (el.dataset.projectEdit) { openProject(el.dataset.projectEdit); return; }
+    if (el.hasAttribute('data-save-project')) { saveProjectDraft(); return; }
+    if (el.hasAttribute('data-delete-project')) { if (confirm('Delete project ' + pdraft.code + '?')) { const id = pdraft.id; closeOverlay(); Store.deleteProject(id); toast('Deleted project'); } return; }
+    if (el.dataset.catDel != null) { const c = el.dataset.catDel; if (confirm('Remove category “' + c + '”? Tasks keep the label.')) { Store.settings.categories = (Store.settings.categories || []).filter((x) => x !== c); Store.saveSettings(); render(); } return; }
     if (el.dataset.view) { view = el.dataset.view; render(); return; }
     if (el.dataset.goto) { view = el.dataset.goto; render(); return; }
     if (el.dataset.open != null && !e.target.closest('[data-unfocus],[data-focus],[data-flag],select,input')) { openDrawer(el.dataset.open); return; }
@@ -1238,8 +1455,9 @@
     if (el.dataset.act) {
       const a = el.dataset.act;
       if (a === 'load-sample') loadSample();
-      else if (a === 'clear-sample') { if (confirm('Remove all example tasks?')) { Store.replaceAll(Store.list().filter((t) => !t.sample), Store.settings); closeOverlay(); toast('Examples removed'); } }
-      else if (a === 'clear-all') { if (confirm('Delete every task and reset settings? Export a backup first if in doubt.')) { Store.replaceAll([], JSON.parse(JSON.stringify(DEFAULT_SETTINGS))); closeOverlay(); toast('Cleared'); } }
+      else if (a === 'new-project') openProject(null);
+      else if (a === 'clear-sample') { if (confirm('Remove all example tasks and example projects?')) { Store.replaceAll(Store.list().filter((t) => !t.sample), Store.settings, Store.projectList().filter((p) => !p.sample)); closeOverlay(); toast('Examples removed'); } }
+      else if (a === 'clear-all') { if (confirm('Delete every task and project and reset settings? Export a backup first if in doubt.')) { Store.replaceAll([], JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), []); closeOverlay(); toast('Cleared'); } }
       else if (a === 'export-json') exportJson();
       else if (a === 'export-csv') exportCsv();
       else if (a === 'copy-report') { const txt = buildReport(); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast('Report copied'), () => { const r = document.createRange(); r.selectNodeContents($('#report')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Select and copy the report text'); }); }
@@ -1259,19 +1477,22 @@
   document.addEventListener('input', (e) => {
     if (e.target.id === 'review-notes') { Store.settings.review.focus = e.target.value; clearTimeout(window.__rn); window.__rn = setTimeout(() => { Store.saveSettings(); $('#report').textContent = buildReport(); }, 400); }
   });
+  $('#project-scope').addEventListener('change', (e) => { setScope(e.target.value); render(); });
   $('#capture-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const inp = $('#capture-input'); const title = inp.value.trim(); if (!title) return;
     const t = blankTask(title);
     Store.saveTask(t);
     inp.value = '';
-    toast('Captured ' + t.id + ' in Backlog');
+    const pr = t.projectId && Store.project(t.projectId);
+    toast('Captured ' + t.id + ' in ' + (pr ? pr.code + ' backlog' : 'Backlog, no project yet'));
   });
   document.addEventListener('keydown', (e) => {
     const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
     if (e.key === 'Escape' && $('#overlay').children.length) { closeOverlay(); return; }
     if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'n') { e.preventDefault(); openDrawer(null); }
+    if (e.key === 'p') { e.preventDefault(); openProject(null); }
     if (e.key === '/') { e.preventDefault(); $('#capture-input').focus(); }
   });
 
@@ -1281,6 +1502,8 @@
     // First open in this browser: seed with examples so every view is legible.
     Store.settings.sampleLoaded = true;
     Store.settings.seq = 17;
+    Store.settings.pseq = 4;
+    sampleProjects().forEach((pr) => { Store.projects[pr.id] = pr; });
     sampleTasks().forEach((t) => { Store.tasks[t.id] = t; });
     Store.persistLocal();
   }

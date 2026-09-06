@@ -126,6 +126,30 @@ Sources are the primary publications named below. Where a claim is a practitione
 
 **Conclusion in the tool.** The nine-step ritual, the generated report, the review history table, and the *Weekly review overdue* rule.
 
+## 11. Every task rolls up to a project (work breakdown structure)
+
+**Rationale.** A PM runs several streams at once. Without a container, status reporting is a manual sort, and tasks that belong to nothing escape every review.
+
+**Business base.** PMI, *A Guide to the Project Management Body of Knowledge* (PMBOK): the work breakdown structure, in which every work package rolls up to a deliverable. Jira's project → epic → issue hierarchy, Asana's project → section → task and Linear's project → issue all enforce the same containment.
+
+**Hypothesis.** A required project on every task, a per-project progress and risk card, and a scope selector that filters every view make project-level status a by-product of daily task hygiene rather than a separate weekly effort.
+
+**Experiment.** Time to produce a project status update before and after. The generated weekly report, scoped to a project, should replace the manual version.
+
+**Conclusion in the tool.** Projects with code, sponsor, objective, target date and status; the Projects view; the scope selector in the top bar; and the *Not under a project* rule.
+
+## 12. Categorise by kind of work, not by project
+
+**Rationale.** A project tells you *what for*; a category tells you *what kind*. The second dimension answers a question the first cannot: is management and billing work crowding out discovery and delivery?
+
+**Business base.** Activity-based time allocation in consulting utilisation reporting; Cagan (*Inspired*, 2018) on the split between discovery and delivery; the Kanban practice of work-item types with their own policies.
+
+**Hypothesis.** Tracking open work by category across projects surfaces an unhealthy mix within two weekly reviews.
+
+**Experiment.** The *Open work by category* table on Metrics, week over week. A rising share of Management and Stakeholder with flat Delivery is the signal to renegotiate meeting load.
+
+**Conclusion in the tool.** A creatable category list, one category per task, category chips on every card, and the category breakdown on Metrics.
+
 ---
 
 ## How the health score is built
